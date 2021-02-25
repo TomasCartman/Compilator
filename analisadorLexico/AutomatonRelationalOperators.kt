@@ -1,0 +1,4 @@
+package analisadorLexico
+
+class AutomatonRelationalOperators {
+}
