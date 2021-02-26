@@ -1,2 +1,9 @@
-sadasad dsd dsd dsd
-ds dsdads dadsd
+var i = 0;
+var c = 1;
+var a = c + 1;
+if(c > a) {
+    print("c>a")
+}
+c<=a
+a == i
+c!= i
