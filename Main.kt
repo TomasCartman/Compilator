@@ -1,5 +1,7 @@
 import analisadorLexico.Lexer
 
+val lexer = Lexer()
+
 fun main() {
-    Lexer.a()
+    lexer.main()
 }
