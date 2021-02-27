@@ -1,4 +1,4 @@
-package analisadorLexico
+package lexicalAnalyzer
 
 import com.sun.istack.internal.Nullable
 

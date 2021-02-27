@@ -1,4 +1,4 @@
-import analisadorLexico.Lexer
+import lexicalAnalyzer.Lexer
 
 val lexer = Lexer()
 

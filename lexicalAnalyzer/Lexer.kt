@@ -1,5 +1,6 @@
-package analisadorLexico
+package lexicalAnalyzer
 
+import utils.RelationalOperatorsType
 import java.io.File
 
 class Lexer {
@@ -23,16 +24,19 @@ class Lexer {
                     // First char and lookahead are valid -> token with two chars
                     if(result && newResult) {
                         position += 1
-                        println("<relop, [$char, $lookaheadChar]>")
+                        val type = RelationalOperatorsType.getType(char, lookaheadChar)
+                        println("{operator, $type}")
                     }
                     // First char is valid but lookahead is not -> token with one char
                     else if(result && !newResult) {
-                        println("<relop, [$char]>")
+                        val type = RelationalOperatorsType.getType(char, null)
+                        println("{operator, $type}")
                     }
                     // First char is invalid but lookahead is valid -> token "!="
                     else if(newResult && !result) {
                         position += 1
-                        println("<relop, [$char, $lookaheadChar]>")
+                        val type = RelationalOperatorsType.getType(char, lookaheadChar)
+                        println("{operator, $type}")
                     }
                     // First char and lookahead are invalid -> no token
                     else {
@@ -40,7 +44,10 @@ class Lexer {
                     }
                 } else {
                     // First char is valid but lookahead is not -> token with one char
-                    if(result) println("<relop, [$char]>") // Create a token
+                    if(result) { // Create a token
+                        val type = RelationalOperatorsType.getType(char, null)
+                        println("{operator, $type}")
+                    }
                     else automatonRelationalOperators.resetAutomaton() // testing the lookahead of end of line, should reset the automaton
                 }
             }

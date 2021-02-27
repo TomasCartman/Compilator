@@ -4,14 +4,14 @@ var a = c + 1;
 if(c > a) {
     print("c>a")
 }
-c<=a
-a == i
+c<=a;
+a == i;
 
 
-b=0
-h =b +  3
-c!= i
-a > = i
+b=0;
+h =b +  3;
+c!= i;
+a > = i;
 while(a >= b && h< c || c==a || i !=c) {
-
+      z=b; b>>a; h <= a;
 }
