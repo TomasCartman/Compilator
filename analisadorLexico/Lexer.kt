@@ -5,7 +5,7 @@ import java.io.BufferedReader
 import java.io.File
 
 class Lexer() {
-    val automatonRelationalOperators = AutomatonRelationalOperators()
+    private val automatonRelationalOperators = AutomatonRelationalOperators()
     lateinit var sourceCode: List<String>
     var line = 0
     var position = 0
@@ -25,11 +25,14 @@ class Lexer() {
             char = nextChar()
         }
 
+        //println(sourceCode)
         /*
         for(page in sourceCode) {
             println(page)
         }
+
          */
+
     }
 
     private fun readFileAsLinesUsingReadLines(fileName: String): List<String>
@@ -43,10 +46,26 @@ class Lexer() {
             char
         }
         // The actual line is valid, but the position variable is a the end of line
-        else if(sourceCode.size > line + 1 && sourceCode[line].length <= position){
+        else if(sourceCode.size > line + 1 && sourceCode[line].length <= position) {
             line += 1
             position = 0
-            sourceCode[line][position]
+            // Checks if is an empty line (this include spaces if there are just them in the line)
+            if(sourceCode[line].isNotEmpty()) {
+                val char = sourceCode[line][position]
+                position += 1
+                return char
+            } else {
+                while (sourceCode.size > line + 1 && sourceCode[line].isEmpty()) {
+                    line += 1
+                }
+                return if(sourceCode.size > line) {
+                    val char = sourceCode[line][position]
+                    position += 1
+                    char
+                } else {
+                    null
+                }
+            }
         }
         // There's no more line to read
         else {
