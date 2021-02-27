@@ -9,7 +9,7 @@ class AutomatonRelationalOperators {
 
     fun putNewChar(c: Char): Boolean {
         lexemeList.add(c)
-
+        //println("Automaton lexemeList: $lexemeList")
         return testLexeme()
     }
 
@@ -21,33 +21,44 @@ class AutomatonRelationalOperators {
 
     private fun testLexeme(): Boolean {
         val char = nextChar() ?: return false
+        if(lexemeList.size > 1 && state == 0) {
+            resetAutomaton()
+            return false
+        }
         var verificationResult = false
         when(state) {
             0 -> {
-                if(char == '=') {
-                    state = 1
-                    verificationResult = true
-                }
-                if(char == '!') {
-                    state = 2
-                    verificationResult = false
-                }
-                if(char == '>') {
-                    state = 3
-                    verificationResult = true
-                }
-                if(char == '<') {
-                    state = 4
-                    verificationResult = true
+                when(char) {
+                    '=' -> {
+                        state = 1
+                        verificationResult = true
+                    }
+                    '!' -> {
+                        state = 2
+                    }
+                    '>' -> {
+                        state = 3
+                        verificationResult = true
+                    }
+                    '<' -> {
+                        state = 4
+                        verificationResult = true
+                    }
                 }
             }
             1, 2, 3, 4 -> {
                 if(char == '=') {
                     state = 5
                     verificationResult = true
+                } else {
+                    verificationResult = false
                 }
+                resetAutomaton()
             }
-            else -> verificationResult = false
+            else -> {
+                verificationResult = false
+                resetAutomaton()
+            }
         }
         return verificationResult
     }

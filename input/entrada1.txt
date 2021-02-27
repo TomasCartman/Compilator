@@ -8,5 +8,10 @@ c<=a
 a == i
 
 
-
+b=0
+h =b +  3
 c!= i
+a > = i
+while(a >= b && h< c || c==a || i !=c) {
+
+}
