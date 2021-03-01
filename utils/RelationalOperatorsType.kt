@@ -2,13 +2,13 @@ package utils
 
 class RelationalOperatorsType {
     companion object {
-        val EQ = "=="
-        val NE = "!="
-        val GT = ">"
-        val LT = "<"
-        val GE = ">="
-        val LE = "<="
-        val AS = "="
+        private const val EQ = "=="
+        private const val NE = "!="
+        private const val GT = ">"
+        private const val LT = "<"
+        private const val GE = ">="
+        private const val LE = "<="
+        private const val AS = "="
 
         fun getType(char1: Char, char2: Char?): String {
             var type = ""

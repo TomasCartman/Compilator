@@ -1,6 +1,6 @@
 package lexicalAnalyzer
 
-import utils.RelationalOperatorsType
+import utils.Token
 import java.io.File
 
 class Lexer {
@@ -14,41 +14,37 @@ class Lexer {
         sourceCode = readFileAsLinesUsingReadLines("./input/entrada1.txt")
 
         var char = nextChar()
+
         while(char != null) {
             if(char != ' ') {
-                val lookaheadChar = nextCharLookahead()
-                val result = automatonRelationalOperators.putNewChar(char)
+                var lexeme = char.toString()
+                var token: Token? = null
+                var isLexemeValid: Boolean
+                var i = 0 // Variable to be sure that at least a lexeme with length of two was tested
 
-                if(lookaheadChar != null) {
-                    val newResult = automatonRelationalOperators.putNewChar(lookaheadChar)
-                    // First char and lookahead are valid -> token with two chars
-                    if(result && newResult) {
-                        position += 1
-                        val type = RelationalOperatorsType.getType(char, lookaheadChar)
-                        println("{operator, $type}")
-                    }
-                    // First char is valid but lookahead is not -> token with one char
-                    else if(result && !newResult) {
-                        val type = RelationalOperatorsType.getType(char, null)
-                        println("{operator, $type}")
-                    }
-                    // First char is invalid but lookahead is valid -> token "!="
-                    else if(newResult && !result) {
-                        position += 1
-                        val type = RelationalOperatorsType.getType(char, lookaheadChar)
-                        println("{operator, $type}")
-                    }
-                    // First char and lookahead are invalid -> no token
+                // Test the automatons until the last long valid lexeme
+                do {
+                    if(automatonRelationalOperators.putNewString(lexeme)) {
+                        isLexemeValid = true
+                        token = automatonRelationalOperators.generateToken()
+                    }// else if, test others automatons
                     else {
-                        automatonRelationalOperators.resetAutomaton()
+                        isLexemeValid = false
                     }
-                } else {
-                    // First char is valid but lookahead is not -> token with one char
-                    if(result) { // Create a token
-                        val type = RelationalOperatorsType.getType(char, null)
-                        println("{operator, $type}")
+
+                    val lookahead = nextCharLookahead() ?: break
+                    if(isLexemeValid || (lookahead != ' ' && i <= 0)) {
+                        lexeme += lookahead.toString()
+                        isLexemeValid = true
                     }
-                    else automatonRelationalOperators.resetAutomaton() // testing the lookahead of end of line, should reset the automaton
+                    i += 1
+
+                } while(isLexemeValid)
+
+                if(token != null) {
+                    println("{" + token.type.type + ", " + token.value + "}")
+
+                    jumpChar(token.value.length -1)
                 }
             }
 
@@ -71,16 +67,19 @@ class Lexer {
         return if(sourceCode.size > line && sourceCode[line].length > position) {
             val char = sourceCode[line][position]
             position += 1
+            lookahead = position
             char
         }
         // The actual line is valid, but the position variable is a the end of line
         else if(sourceCode.size > line + 1 && sourceCode[line].length <= position) {
             line += 1
             position = 0
+            lookahead = position
             // Checks if is not an empty line (this include spaces if there are just them in the line)
             if(sourceCode[line].isNotEmpty()) {
                 val char = sourceCode[line][position]
                 position += 1
+                lookahead = position
                 return char
             } else {
                 // While there is just empty lines or lines with spaces, skip to next line
@@ -90,6 +89,7 @@ class Lexer {
                 return if(sourceCode.size > line) {
                     val char = sourceCode[line][position]
                     position += 1
+                    lookahead = position
                     char
                 } else {
                     null
@@ -103,11 +103,20 @@ class Lexer {
     }
 
     private fun nextCharLookahead(): Char? {
-        lookahead = position
         return if(sourceCode.size > line && sourceCode[line].length > lookahead) {
-            sourceCode[line][lookahead]
+            val char = sourceCode[line][lookahead]
+            lookahead += 1
+            char
         } else {
             null
+        }
+    }
+
+    private fun jumpChar(jumpSize: Int) {
+        var i = jumpSize
+        while(i > 0) {
+            nextChar()
+            i -= 1
         }
     }
 }

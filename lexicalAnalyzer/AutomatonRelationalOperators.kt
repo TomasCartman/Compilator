@@ -1,75 +1,72 @@
 package lexicalAnalyzer
 
-import com.sun.istack.internal.Nullable
+import utils.ClassType
+import utils.Token
 
 class AutomatonRelationalOperators {
-    private var lexemeList = mutableListOf<Char>()
-    private var charPosition: Int = 0
+    private var lexeme: String = ""
     private var state: Int = 0
 
-    fun putNewChar(c: Char): Boolean {
-        lexemeList.add(c)
-        //println("Automaton lexemeList: $lexemeList")
-        return testLexeme()
+    fun putNewString(s: String): Boolean {
+        resetAutomaton()
+        lexeme = s
+
+        return testStringLexeme()
     }
 
-    fun resetAutomaton() {
-        lexemeList = mutableListOf()
-        charPosition = 0
+    fun generateToken(): Token {
+        val type = ClassType.createRelOpType()
+        val token = Token(type)
+        when(state) {
+            1 -> token.value = "="
+            2 -> token.value = "=="
+            4 -> token.value = "!="
+            5 -> token.value = ">"
+            6 -> token.value = ">="
+            7 -> token.value ="<"
+            8 -> token.value = "<="
+        }
+        return token
+    }
+
+    private fun resetAutomaton() {
         state = 0
     }
 
-    private fun testLexeme(): Boolean {
-        val char = nextChar() ?: return false
-        if(lexemeList.size > 1 && state == 0) {
-            resetAutomaton()
-            return false
-        }
-        var verificationResult = false
-        when(state) {
-            0 -> {
-                when(char) {
-                    '=' -> {
-                        state = 1
-                        verificationResult = true
-                    }
-                    '!' -> {
-                        state = 2
-                    }
-                    '>' -> {
-                        state = 3
-                        verificationResult = true
-                    }
-                    '<' -> {
-                        state = 4
-                        verificationResult = true
-                    }
-                }
-            }
-            1, 2, 3, 4 -> {
-                if(char == '=') {
-                    state = 5
-                    verificationResult = true
-                } else {
-                    verificationResult = false
-                }
-                resetAutomaton()
-            }
-            else -> {
-                verificationResult = false
-                resetAutomaton()
-            }
-        }
-        return verificationResult
-    }
+    private fun testStringLexeme(): Boolean {
+        if(lexeme.length > 2) return false
 
-    @Nullable
-    private fun nextChar(): Char? {
-        if(lexemeList.size > charPosition) {
-            val char = lexemeList[charPosition]
-            charPosition += 1
-            return char
+        for(char in lexeme) {
+            when(state) {
+                0 -> {
+                    state = when(char) {
+                        '=' -> 1
+                        '!' -> 3
+                        '>' -> 5
+                        '<' -> 7
+                        else -> 9
+                    }
+                }
+                1 -> {
+                    state = if(char == '=') 2
+                    else 9
+                }
+                3 -> {
+                    state = if(char == '=') 4
+                    else 9
+                }
+                5 -> {
+                    state = if(char == '=') 6
+                    else 9
+                }
+                7 -> {
+                    state = if(char == '=') 8
+                    else 9
+                }
+                else -> state = 9
+            }
         }
-        return null
+
+        return state == 1 || state == 2 || state == 4 || state == 5 || state == 6 || state == 7 || state == 8
     }
 }
