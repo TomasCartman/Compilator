@@ -12,6 +12,12 @@ var int c = 1;
 var int a = c + 1;
 var boolean isValid = true
 var string name = "name"
+
+i / c
+
+a * c
+a*i
+a = c/a
 if(c > a) {
     print("c>a")
 } else {
@@ -20,6 +26,13 @@ if(c > a) {
 c<=a;
 a == i;
 
+
+var int b = 1
+
+b++
+b--
+b/ b
+b *2
 
 b=0;
 h =b +  3;

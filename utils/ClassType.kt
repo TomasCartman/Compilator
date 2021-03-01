@@ -4,6 +4,7 @@ const val RELOP = "relop"
 const val ID = "id"
 const val NUMBER = "number"
 const val KEYWORD = "keyword"
+const val AROP = "arop"
 
 class ClassType private constructor(type: String) {
     var type: String = type
@@ -24,6 +25,10 @@ class ClassType private constructor(type: String) {
 
         fun createKeywordType(): ClassType {
             return ClassType(KEYWORD)
+        }
+
+        fun createArOpType(): ClassType {
+            return ClassType(AROP)
         }
     }
 }
