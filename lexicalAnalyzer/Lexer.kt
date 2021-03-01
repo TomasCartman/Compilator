@@ -5,6 +5,7 @@ import java.io.File
 
 class Lexer {
     private val automatonRelationalOperators = AutomatonRelationalOperators()
+    private val automatonNumbers = AutomatonNumbers()
     private lateinit var sourceCode: List<String>
     private var line = 0
     private var position = 0
@@ -27,6 +28,10 @@ class Lexer {
                     if(automatonRelationalOperators.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonRelationalOperators.generateToken()
+                    }
+                    else if(automatonNumbers.putNewString(lexeme)) {
+                        isLexemeValid = true
+                        token = automatonNumbers.generateToken()
                     }// else if, test others automatons
                     else {
                         isLexemeValid = false
@@ -36,8 +41,10 @@ class Lexer {
                     if(isLexemeValid || (lookahead != ' ' && i <= 0)) {
                         lexeme += lookahead.toString()
                         isLexemeValid = true
+                        i = 0
+                    } else {
+                        i += 1
                     }
-                    i += 1
 
                 } while(isLexemeValid)
 
