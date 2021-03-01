@@ -1,17 +1,21 @@
 !=
 >>
 
-var xc = 1.111
-var hs = 2.03823
-var ty = 0.
-var tu = 0. 1
-var nvv = 2 .1
+var real xc = 1.111
+var real hs = 2.03823
+var real ty = 0.
+var real tu = 0. 1
+var real nvv = 2 .1
 
-var i = 0;
-var c = 1;
-var a = c + 1;
+var int i = 0;
+var int c = 1;
+var int a = c + 1;
+var boolean isValid = true
+var string name = "name"
 if(c > a) {
     print("c>a")
+} else {
+    isValid = false
 }
 c<=a;
 a == i;

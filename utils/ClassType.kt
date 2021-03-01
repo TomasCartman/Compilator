@@ -2,8 +2,8 @@ package utils
 
 const val RELOP = "relop"
 const val ID = "id"
-const val BOOLOP = "boolop"
 const val NUMBER = "number"
+const val KEYWORD = "keyword"
 
 class ClassType private constructor(type: String) {
     var type: String = type
@@ -18,12 +18,12 @@ class ClassType private constructor(type: String) {
             return ClassType(ID)
         }
 
-        fun createBoolOpType(): ClassType {
-            return ClassType(BOOLOP)
-        }
-
         fun createNumberType(): ClassType {
             return ClassType(NUMBER)
+        }
+
+        fun createKeywordType(): ClassType {
+            return ClassType(KEYWORD)
         }
     }
 }

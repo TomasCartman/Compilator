@@ -6,6 +6,7 @@ import java.io.File
 class Lexer {
     private val automatonRelationalOperators = AutomatonRelationalOperators()
     private val automatonNumbers = AutomatonNumbers()
+    private val automatonKeywords = AutomatonKeywords()
     private lateinit var sourceCode: List<String>
     private var line = 0
     private var position = 0
@@ -25,11 +26,13 @@ class Lexer {
 
                 // Test the automatons until the last long valid lexeme
                 do {
-                    if(automatonRelationalOperators.putNewString(lexeme)) {
+                    if(automatonKeywords.putNewString(lexeme)) {
+                        isLexemeValid = true
+                        token = automatonKeywords.generateToken()
+                    } else if(automatonRelationalOperators.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonRelationalOperators.generateToken()
-                    }
-                    else if(automatonNumbers.putNewString(lexeme)) {
+                    } else if(automatonNumbers.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonNumbers.generateToken()
                     }// else if, test others automatons
