@@ -1,3 +1,13 @@
+// this list should not be read by the lexer
+
+/* skip
+all
+these
+lines
+*/
+
+/* testing if this is working */
+
 !=
 >>
 ||
@@ -9,6 +19,12 @@
 |
 &
 !!!
+
+// Skip this line
+
+/*also skip
+
+this one*/
 
 var real xc = 1.111
 var real hs = 2.03823
@@ -36,6 +52,8 @@ c<=a;
 a == i;
 
 if(a > b && c==a || i<a) {
+
+} else if(a<b&&c==a||i==i) {
 
 }
 

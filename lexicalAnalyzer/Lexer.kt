@@ -10,6 +10,7 @@ class Lexer {
     private val automatonArithmeticOperators = AutomatonArithmeticOperators()
     private val automatonIdentifiers = AutomatonIdentifiers()
     private val automatonLogicalOperators = AutomatonLogicalOperators()
+    private val automatonComments = AutomatonComments()
     private lateinit var sourceCode: List<String>
     private var line = 0
     private var position = 0
@@ -25,6 +26,7 @@ class Lexer {
                 var lexeme = char.toString()
                 var token: Token? = null
                 var isLexemeValid: Boolean
+                var isLineComment = false
                 var i = 0 // Variable to be sure that at least a lexeme with length of two was tested
 
                 // Test the automatons until the last long valid lexeme
@@ -47,7 +49,20 @@ class Lexer {
                     } else if(automatonNumbers.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonNumbers.generateToken()
-                    }  // else if, test others automatons
+                    } else if(automatonComments.putNewString(lexeme)) {
+                        token = automatonComments.generateToken()
+                        if(token.value == "//") {
+                            isLineComment = true
+                            line += 1
+                        }
+                        else if(token.value == "/*") {
+                            isLineComment = true
+                            skipComments()
+                        } else {
+                            //    '*/' before opening comment, error
+                        }
+                        break
+                    } // else if, test others automatons
                     else {
                         isLexemeValid = false
                     }
@@ -63,7 +78,7 @@ class Lexer {
 
                 } while(isLexemeValid)
 
-                if(token != null) {
+                if(token != null && !isLineComment) {
                     println("{" + token.type.type + ", " + token.value + "}")
 
                     jumpChar(token.value.length - 1)
@@ -140,6 +155,15 @@ class Lexer {
             nextChar()
             i -= 1
         }
+    }
+
+    private fun skipComments() {
+        do {
+            val newChar = nextChar()
+            val newLookaheadChar = nextCharLookahead()
+            if(newChar == null) break
+        } while(newChar != '*' || newLookaheadChar != '/')
+        jumpChar(1)
     }
 }
 
