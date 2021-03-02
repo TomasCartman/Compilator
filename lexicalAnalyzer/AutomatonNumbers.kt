@@ -35,11 +35,15 @@ class AutomatonNumbers {
                     } else 4
                 }
                 1 -> {
-                    state = if(char.isDigit()) {
-                        1
-                    } else if(char == '.') {
-                        2
-                    } else 4
+                    state = when {
+                        char.isDigit() -> {
+                            1
+                        }
+                        char == '.' -> {
+                            2
+                        }
+                        else -> 4
+                    }
                 }
                 2 -> {
                     state = if(char.isDigit()) {

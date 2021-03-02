@@ -31,6 +31,7 @@ class Lexer {
 
                 // Test the automatons until the last long valid lexeme
                 do {
+
                     if(automatonKeywords.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonKeywords.generateToken()
@@ -51,15 +52,18 @@ class Lexer {
                         token = automatonNumbers.generateToken()
                     } else if(automatonComments.putNewString(lexeme)) {
                         token = automatonComments.generateToken()
-                        if(token.value == "//") {
-                            isLineComment = true
-                            line += 1
-                        }
-                        else if(token.value == "/*") {
-                            isLineComment = true
-                            skipComments()
-                        } else {
-                            //    '*/' before opening comment, error
+                        when(token.value) {
+                            "//" -> {
+                                isLineComment = true
+                                line += 1
+                            }
+                            "/*" -> {
+                                isLineComment = true
+                                skipComments()
+                            }
+                            else -> {
+                                //    '*/' before opening comment, error
+                            }
                         }
                         break
                     } // else if, test others automatons
