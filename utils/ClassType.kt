@@ -5,6 +5,7 @@ const val ID = "id"
 const val NUMBER = "number"
 const val KEYWORD = "keyword"
 const val AROP = "arop"
+const val LOGOP = "logop"
 
 class ClassType private constructor(type: String) {
     var type: String = type
@@ -29,6 +30,10 @@ class ClassType private constructor(type: String) {
 
         fun createArOpType(): ClassType {
             return ClassType(AROP)
+        }
+
+        fun createLogOpType(): ClassType {
+            return ClassType(LOGOP)
         }
     }
 }

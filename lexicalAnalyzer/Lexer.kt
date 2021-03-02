@@ -9,6 +9,7 @@ class Lexer {
     private val automatonKeywords = AutomatonKeywords()
     private val automatonArithmeticOperators = AutomatonArithmeticOperators()
     private val automatonIdentifiers = AutomatonIdentifiers()
+    private val automatonLogicalOperators = AutomatonLogicalOperators()
     private lateinit var sourceCode: List<String>
     private var line = 0
     private var position = 0
@@ -37,13 +38,16 @@ class Lexer {
                     } else if(automatonRelationalOperators.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonRelationalOperators.generateToken()
-                    } else if(automatonNumbers.putNewString(lexeme)) {
+                    } else if(automatonLogicalOperators.putNewString(lexeme)) {
                         isLexemeValid = true
-                        token = automatonNumbers.generateToken()
+                        token = automatonLogicalOperators.generateToken()
                     } else if(automatonArithmeticOperators.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonArithmeticOperators.generateToken()
-                    } // else if, test others automatons
+                    } else if(automatonNumbers.putNewString(lexeme)) {
+                        isLexemeValid = true
+                        token = automatonNumbers.generateToken()
+                    }  // else if, test others automatons
                     else {
                         isLexemeValid = false
                     }
