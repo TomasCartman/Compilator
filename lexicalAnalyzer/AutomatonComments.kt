@@ -48,7 +48,10 @@ class AutomatonComments {
                     state = if(char == '/') 5
                     else 6
                 }
-                else -> 6
+                else -> {
+                    state = 6
+                    break
+                }
             }
         }
 

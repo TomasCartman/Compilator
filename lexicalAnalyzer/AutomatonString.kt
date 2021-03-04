@@ -3,7 +3,7 @@ package lexicalAnalyzer
 import utils.ClassType
 import utils.Token
 
-class AutomatonNumbers {
+class AutomatonString {
     private var lexeme: String = ""
     private var state: Int = 0
 
@@ -15,10 +15,10 @@ class AutomatonNumbers {
     }
 
     fun generateToken(): Token {
-        val type = ClassType.createNumberType()
+        val type = ClassType.createStringType()
         val token = Token(type)
         token.value = lexeme
-        return  token
+        return token
     }
 
     private fun resetAutomaton() {
@@ -26,43 +26,33 @@ class AutomatonNumbers {
     }
 
     private fun testStringLexeme(): Boolean {
-
         for(char in lexeme) {
             when(state) {
                 0 -> {
-                    state = if(char.isDigit()) {
-                        1
-                    } else 4
+                    state = if(char == '"') 1
+                    else 4
                 }
                 1 -> {
-                    state = when {
-                        char.isDigit() -> {
-                            1
-                        }
-                        char == '.' -> {
-                            2
-                        }
-                        else -> 4
-                    }
+                    state = if(char.isLetterOrDigit() || isValidSymbol(char.toInt()) || char == '\"') 2
+                    else 4
                 }
                 2 -> {
-                    state = if(char.isDigit()) {
-                        3
-                    } else 4
-                }
-                3 -> {
-                    state = if(char.isDigit()) {
-                        3
-                    } else 4
+                    state = if(char.isLetterOrDigit() || isValidSymbol(char.toInt())) 2
+                    else if(char == '"') 3
+                    else 4
                 }
                 else -> {
                     state = 4
                     break
                 }
             }
+
         }
 
-        return state == 1 || state == 3
+        return state == 1 || state == 2 || state == 3
     }
 
+    private fun isValidSymbol(charCode: Int): Boolean {
+        return (charCode in 32..33) || (charCode in 35..126)
+    }
 }

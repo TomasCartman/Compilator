@@ -7,6 +7,7 @@ const val KEYWORD = "keyword"
 const val AROP = "arop"
 const val LOGOP = "logop"
 const val COMMENT = "comment"
+const val STRING = "string"
 
 class ClassType private constructor(type: String) {
     var type: String = type
@@ -39,6 +40,10 @@ class ClassType private constructor(type: String) {
 
         fun createCommentType(): ClassType {
             return ClassType(COMMENT)
+        }
+
+        fun createStringType(): ClassType {
+            return ClassType(STRING)
         }
     }
 }

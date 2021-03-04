@@ -10,6 +10,7 @@ class Lexer {
     private val automatonArithmeticOperators = AutomatonArithmeticOperators()
     private val automatonIdentifiers = AutomatonIdentifiers()
     private val automatonLogicalOperators = AutomatonLogicalOperators()
+    private val automatonString = AutomatonString()
     private val automatonComments = AutomatonComments()
     private lateinit var sourceCode: List<String>
     private var line = 0
@@ -17,7 +18,7 @@ class Lexer {
     private var lookahead = 0
 
     fun main() {
-        sourceCode = readFileAsLinesUsingReadLines("./input/entrada1.txt")
+        sourceCode = readFileAsLinesUsingReadLines("./input/entrada3.txt")
 
         var char = nextChar()
 
@@ -27,6 +28,7 @@ class Lexer {
                 var token: Token? = null
                 var isLexemeValid: Boolean
                 var isLineComment = false
+                var isString = false
                 var i = 0 // Variable to be sure that at least a lexeme with length of two was tested
 
                 // Test the automatons until the last long valid lexeme
@@ -50,6 +52,15 @@ class Lexer {
                     } else if(automatonNumbers.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonNumbers.generateToken()
+                    } else if(automatonString.putNewString(lexeme)) {
+                        isLexemeValid = true
+                        isString = true
+                        do {
+                            val newChar = nextCharLookahead()
+                            token = automatonString.generateToken()
+                            lexeme += newChar
+                        } while (automatonString.putNewString(lexeme))
+                        break
                     } else if(automatonComments.putNewString(lexeme)) {
                         token = automatonComments.generateToken()
                         when(token.value) {
@@ -85,13 +96,14 @@ class Lexer {
                 if(token != null && !isLineComment) {
                     println("{" + token.type.type + ", " + token.value + "}")
 
-                    jumpChar(token.value.length - 1)
+                    //if(!isString) {
+                        jumpChar(token.value.length - 1)
+                    //}
                 }
             }
 
             char = nextChar()
         }
-
         //println(sourceCode)
         /*
         for(page in sourceCode) {
@@ -171,3 +183,10 @@ class Lexer {
     }
 }
 
+
+
+
+
+/*
+Cadeia de caracters: Definir symbols como no AutomatonKeywords, e dois estados para dentro dos parenteses para '\' e '"'
+ */

@@ -1,3 +1,4 @@
+var string name = "name"
 // this list should not be read by the lexer
 
 /* skip

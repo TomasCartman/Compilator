@@ -63,7 +63,10 @@ class AutomatonRelationalOperators {
                     state = if(char == '=') 8
                     else 9
                 }
-                else -> state = 9
+                else -> {
+                    state = 9
+                    break
+                }
             }
         }
 

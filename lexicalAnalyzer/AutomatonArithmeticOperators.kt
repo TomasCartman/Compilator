@@ -47,7 +47,10 @@ class AutomatonArithmeticOperators {
                     state = if(char == '-') 6
                     else 7
                 }
-                else -> state = 7
+                else -> {
+                    state = 7
+                    break
+                }
             }
         }
 
