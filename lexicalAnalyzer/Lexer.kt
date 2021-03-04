@@ -2,6 +2,8 @@ package lexicalAnalyzer
 
 import utils.Token
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class Lexer {
     private val automatonRelationalOperators = AutomatonRelationalOperators()
@@ -18,8 +20,37 @@ class Lexer {
     private var lookahead = 0
 
     fun main() {
-        sourceCode = readFileAsLinesUsingReadLines("./input/entrada3.txt")
+        //sourceCode = readFileAsLinesUsingReadLines("./input/entrada3.txt")
+        readAllInputFiles()
+    }
 
+    private fun readFileAsLinesUsingReadLines(fileName: String): List<String>
+            = File(fileName).readLines()
+
+    private fun readAllInputFiles() {
+        val path = Paths.get("input").toAbsolutePath()
+        if(Files.exists(path) && Files.isDirectory(path)) {
+            File(path.toString()).walk().forEach {
+                val fileName = it.name
+                if(fileName.startsWith("entrada") && fileName.endsWith(".txt")) {
+                    println("Reading file: $fileName")
+                    sourceCode = readFileAsLinesUsingReadLines(it.absolutePath)
+                    resetLexer()
+                    checkLexeme()
+                }
+            }
+        } else {
+            throw Exception("You need a input directory to run the compiler")
+        }
+    }
+
+    private fun resetLexer() {
+        line = 0
+        position = 0
+        lookahead = 0
+    }
+
+    private fun checkLexeme() {
         var char = nextChar()
 
         while(char != null) {
@@ -28,7 +59,6 @@ class Lexer {
                 var token: Token? = null
                 var isLexemeValid: Boolean
                 var isLineComment = false
-                var isString = false
                 var i = 0 // Variable to be sure that at least a lexeme with length of two was tested
 
                 // Test the automatons until the last long valid lexeme
@@ -53,8 +83,6 @@ class Lexer {
                         isLexemeValid = true
                         token = automatonNumbers.generateToken()
                     } else if(automatonString.putNewString(lexeme)) {
-                        isLexemeValid = true
-                        isString = true
                         do {
                             val newChar = nextCharLookahead()
                             token = automatonString.generateToken()
@@ -96,24 +124,13 @@ class Lexer {
                 if(token != null && !isLineComment) {
                     println("{" + token.type.type + ", " + token.value + "}")
 
-                    //if(!isString) {
-                        jumpChar(token.value.length - 1)
-                    //}
+                    jumpChar(token.value.length - 1)
                 }
             }
 
             char = nextChar()
         }
-        //println(sourceCode)
-        /*
-        for(page in sourceCode) {
-            println(page)
-        }
-         */
     }
-
-    private fun readFileAsLinesUsingReadLines(fileName: String): List<String>
-            = File(fileName).readLines()
 
     private fun nextChar(): Char? {
         // It has one or more lines to read and the actual line it's not at the end yet
@@ -182,10 +199,6 @@ class Lexer {
         jumpChar(1)
     }
 }
-
-
-
-
 
 /*
 Cadeia de caracters: Definir symbols como no AutomatonKeywords, e dois estados para dentro dos parenteses para '\' e '"'

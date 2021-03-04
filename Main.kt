@@ -1,4 +1,3 @@
-import lexicalAnalyzer.AutomatonString
 import lexicalAnalyzer.Lexer
 
 val lexer = Lexer()
