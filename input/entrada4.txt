@@ -1,4 +1,4 @@
-string Mensagem = "Hello world";
+string Mensagem = "Hello \" world\"";
 print("Digite o nome");
 read(nome);
 print("Digite a idade");

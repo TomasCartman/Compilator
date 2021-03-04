@@ -12,6 +12,7 @@ class Lexer {
     private val automatonArithmeticOperators = AutomatonArithmeticOperators()
     private val automatonIdentifiers = AutomatonIdentifiers()
     private val automatonLogicalOperators = AutomatonLogicalOperators()
+    private val automatonDelimiters = AutomatonDelimiters()
     private val automatonString = AutomatonString()
     private val automatonComments = AutomatonComments()
     private lateinit var sourceCode: List<String>
@@ -32,7 +33,7 @@ class Lexer {
         if(Files.exists(path) && Files.isDirectory(path)) {
             File(path.toString()).walk().forEach {
                 val fileName = it.name
-                if(fileName.startsWith("entrada") && fileName.endsWith(".txt")) {
+                if(fileName.startsWith("entrada3") && fileName.endsWith(".txt")) {
                     println("Reading file: $fileName")
                     sourceCode = readFileAsLinesUsingReadLines(it.absolutePath)
                     resetLexer()
@@ -82,12 +83,15 @@ class Lexer {
                     } else if(automatonNumbers.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonNumbers.generateToken()
+                    } else if(automatonDelimiters.putNewString(lexeme)) {
+                        isLexemeValid = true
+                        token = automatonDelimiters.generateToken()
                     } else if(automatonString.putNewString(lexeme)) {
                         do {
                             val newChar = nextCharLookahead()
                             token = automatonString.generateToken()
                             lexeme += newChar
-                        } while (automatonString.putNewString(lexeme))
+                        } while (automatonString.putNewString(lexeme) && newChar != null)
                         break
                     } else if(automatonComments.putNewString(lexeme)) {
                         token = automatonComments.generateToken()
@@ -95,6 +99,8 @@ class Lexer {
                             "//" -> {
                                 isLineComment = true
                                 line += 1
+                                position = 0
+                                lookahead = 0
                             }
                             "/*" -> {
                                 isLineComment = true
@@ -111,7 +117,7 @@ class Lexer {
                     }
 
                     val lookahead = nextCharLookahead() ?: break
-                    if(isLexemeValid || (lookahead != ' ' && i <= 0)) {
+                    if(isLexemeValid || (!lookahead.isWhitespace() && i <= 0)) {
                         lexeme += lookahead.toString()
                         isLexemeValid = true
                         i = 0
@@ -130,6 +136,8 @@ class Lexer {
 
             char = nextChar()
         }
+
+        // Puts all the error here or a message of success
     }
 
     private fun nextChar(): Char? {
@@ -194,7 +202,7 @@ class Lexer {
         do {
             val newChar = nextChar()
             val newLookaheadChar = nextCharLookahead()
-            if(newChar == null) break
+            if(newChar == null) break // Indicates a error here
         } while(newChar != '*' || newLookaheadChar != '/')
         jumpChar(1)
     }
@@ -202,4 +210,9 @@ class Lexer {
 
 /*
 Cadeia de caracters: Definir symbols como no AutomatonKeywords, e dois estados para dentro dos parenteses para '\' e '"'
+ */
+
+/*
+Delimetadores: ao testar o ponto '.', usar um strip() para garantir que não há espaços em branco entre o ponto
+(na real, acho que nem vai funcionar)
  */

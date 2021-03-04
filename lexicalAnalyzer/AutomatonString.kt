@@ -30,26 +30,37 @@ class AutomatonString {
             when(state) {
                 0 -> {
                     state = if(char == '"') 1
-                    else 4
+                    else 6
                 }
                 1 -> {
-                    state = if(char.isLetterOrDigit() || isValidSymbol(char.toInt()) || char == '\"') 2
-                    else 4
+                    state = if(char == '\\') 3
+                    else if(char.isLetterOrDigit() || isValidSymbol(char.toInt())) 2
+                    else 6
                 }
                 2 -> {
-                    state = if(char.isLetterOrDigit() || isValidSymbol(char.toInt())) 2
-                    else if(char == '"') 3
-                    else 4
+                    state = if(char == '\\') 3
+                    else if(char.isLetterOrDigit() || isValidSymbol(char.toInt())) 2
+                    else if(char == '"') 5
+                    else 6
+                }
+                3 -> {
+                    state = if(char == '"') 4
+                    else 6
+                }
+                4 -> {
+                    state = if(char == '\\') 3
+                    else if(char.isLetterOrDigit() || isValidSymbol(char.toInt())) 2
+                    else 6
                 }
                 else -> {
-                    state = 4
+                    state = 6
                     break
                 }
             }
 
         }
 
-        return state == 1 || state == 2 || state == 3
+        return state == 1 || state == 2 || state == 3 || state == 4 || state == 5
     }
 
     private fun isValidSymbol(charCode: Int): Boolean {

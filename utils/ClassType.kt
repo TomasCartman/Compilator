@@ -1,13 +1,14 @@
 package utils
 
-const val RELOP = "relop"
-const val ID = "id"
+const val RELOP = "relationalOperator"
+const val ID = "identifier"
 const val NUMBER = "number"
 const val KEYWORD = "keyword"
-const val AROP = "arop"
-const val LOGOP = "logop"
+const val AROP = "arithmeticOperator"
+const val LOGOP = "logicalOperator"
 const val COMMENT = "comment"
 const val STRING = "string"
+const val DELIM = "delimiter"
 
 class ClassType private constructor(type: String) {
     var type: String = type
@@ -44,6 +45,10 @@ class ClassType private constructor(type: String) {
 
         fun createStringType(): ClassType {
             return ClassType(STRING)
+        }
+
+        fun createDelimiterType(): ClassType {
+            return ClassType(DELIM)
         }
     }
 }
