@@ -2,6 +2,8 @@ package lexicalAnalyzer
 
 import utils.Token
 import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -15,13 +17,14 @@ class Lexer {
     private val automatonDelimiters = AutomatonDelimiters()
     private val automatonString = AutomatonString()
     private val automatonComments = AutomatonComments()
+
     private lateinit var sourceCode: List<String>
+    private var tokenList: MutableList<Token> = mutableListOf()
     private var line = 0
     private var position = 0
     private var lookahead = 0
 
     fun main() {
-        //sourceCode = readFileAsLinesUsingReadLines("./input/entrada3.txt")
         readAllInputFiles()
     }
 
@@ -33,11 +36,15 @@ class Lexer {
         if(Files.exists(path) && Files.isDirectory(path)) {
             File(path.toString()).walk().forEach {
                 val fileName = it.name
-                if(fileName.startsWith("entrada3") && fileName.endsWith(".txt")) {
+                if(fileName.startsWith("entrada1") && fileName.endsWith(".txt")) { // Put the startsWith to be 'entrada' instead of 'entrada3'
                     println("Reading file: $fileName")
                     sourceCode = readFileAsLinesUsingReadLines(it.absolutePath)
                     resetLexer()
                     checkLexeme()
+                    deleteFileIfExists(fileName)
+                    for(token in tokenList) {
+                        writeOnFile(fileName, "< ${token.type.type}, ${token.value} >\n")
+                    }
                 }
             }
         } else {
@@ -45,10 +52,39 @@ class Lexer {
         }
     }
 
+    private fun writeOnFile(fileName: String, text: String) {
+        val directoryPath = Paths.get("output")
+        val filePath = Paths.get("output/$fileName")
+        if(Files.exists(directoryPath) && Files.isDirectory(directoryPath)) {
+            try {
+                val fw = FileWriter(filePath.toFile(), true)
+                fw.write(text)
+                fw.close()
+            } catch (e: IOException) {
+                println("Error on writing file: $e")
+            }
+        } else {
+            Files.createDirectory(directoryPath)
+            try {
+                val fw = FileWriter(filePath.toFile(), true)
+                fw.write(text)
+                fw.close()
+            } catch (e: IOException) {
+                println("Error on writing file: $e")
+            }
+        }
+    }
+
+    private fun deleteFileIfExists(fileName: String) {
+        val filePath = Paths.get("output/$fileName")
+        Files.deleteIfExists(filePath)
+    }
+
     private fun resetLexer() {
         line = 0
         position = 0
         lookahead = 0
+        tokenList = mutableListOf()
     }
 
     private fun checkLexeme() {
@@ -128,16 +164,16 @@ class Lexer {
                 } while(isLexemeValid)
 
                 if(token != null && !isLineComment) {
-                    println("{" + token.type.type + ", " + token.value + "}")
-
+                    //println("{" + token.type.type + ", " + token.value + "}")
+                    tokenList.add(token)
                     jumpChar(token.value.length - 1)
+                } else {
+                    println(lexeme)
                 }
             }
 
             char = nextChar()
         }
-
-        // Puts all the error here or a message of success
     }
 
     private fun nextChar(): Char? {
