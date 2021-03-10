@@ -1,14 +1,14 @@
 package utils
 
-const val RELOP = "relationalOperator"
-const val ID = "identifier"
-const val NUMBER = "number"
-const val KEYWORD = "keyword"
-const val AROP = "arithmeticOperator"
-const val LOGOP = "logicalOperator"
+const val RELOP = "REL"
+const val ID = "IDE"
+const val NUMBER = "NRO"
+const val KEYWORD = "PRE"
+const val AROP = "ART"
+const val LOGOP = "LOG"
 const val COMMENT = "comment"
-const val STRING = "string"
-const val DELIM = "delimiter"
+const val STRING = "CAD"
+const val DELIM = "DEL"
 
 class ClassType private constructor(type: String) {
     var type: String = type

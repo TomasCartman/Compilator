@@ -36,14 +36,14 @@ class Lexer {
         if(Files.exists(path) && Files.isDirectory(path)) {
             File(path.toString()).walk().forEach {
                 val fileName = it.name
-                if(fileName.startsWith("entrada1") && fileName.endsWith(".txt")) { // Put the startsWith to be 'entrada' instead of 'entrada3'
+                if(fileName.startsWith("entrada5") && fileName.endsWith(".txt")) { // Put the startsWith to be 'entrada' instead of 'entrada3'
                     println("Reading file: $fileName")
                     sourceCode = readFileAsLinesUsingReadLines(it.absolutePath)
                     resetLexer()
                     checkLexeme()
                     deleteFileIfExists(fileName)
                     for(token in tokenList) {
-                        writeOnFile(fileName, "< ${token.type.type}, ${token.value} >\n")
+                        writeOnFile(fileName, "[${token.line}] ${token.type.type} ${token.value}\n")
                     }
                 }
             }
@@ -122,7 +122,7 @@ class Lexer {
                     } else if(automatonDelimiters.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonDelimiters.generateToken()
-                    } else if(automatonString.putNewString(lexeme)) {
+                    } else if(automatonString.putNewString(lexeme)) { // Change the way this automaton works
                         do {
                             val newChar = nextCharLookahead()
                             token = automatonString.generateToken()
@@ -153,22 +153,23 @@ class Lexer {
                     }
 
                     val lookahead = nextCharLookahead() ?: break
-                    if(isLexemeValid || (!lookahead.isWhitespace() && i <= 0)) {
+                    if(isLexemeValid && (!lookahead.isWhitespace())) {
                         lexeme += lookahead.toString()
                         isLexemeValid = true
-                        i = 0
+                        //i = 0
                     } else {
-                        i += 1
+                        i = 1
+                        isLexemeValid = false
                     }
 
                 } while(isLexemeValid)
 
                 if(token != null && !isLineComment) {
-                    //println("{" + token.type.type + ", " + token.value + "}")
+                    token.line = line + 1
                     tokenList.add(token)
                     jumpChar(token.value.length - 1)
                 } else {
-                    println(lexeme)
+                    if(!isLineComment && lexeme.isNotBlank()) println(lexeme)
                 }
             }
 
