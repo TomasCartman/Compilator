@@ -40,8 +40,4 @@ internal class AutomatonLogicalOperatorsTest {
         assertEquals(false, automaton.putNewString("+"))
         assertEquals(false, automaton.putNewString(">="))
     }
-
-    @Test
-    fun generateToken() {
-    }
 }

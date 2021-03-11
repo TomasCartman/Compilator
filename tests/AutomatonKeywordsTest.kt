@@ -58,8 +58,4 @@ internal class AutomatonKeywordsTest {
         assertEquals(false, automaton.putNewString("232.2"))
         assertEquals(false, automaton.putNewString("falsent"))
     }
-
-    @Test
-    fun generateToken() {
-    }
 }

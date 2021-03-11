@@ -19,7 +19,6 @@ internal class AutomatonCommentsTest {
         // Valid
         assertEquals(true, automaton.putNewString("/*"))
         assertEquals(true, automaton.putNewString("//"))
-        assertEquals(true, automaton.putNewString("*/"))
 
         // Invalid
         assertEquals(false, automaton.putNewString("///"))

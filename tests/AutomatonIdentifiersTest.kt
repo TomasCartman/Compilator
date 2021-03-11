@@ -45,8 +45,4 @@ internal class AutomatonIdentifiersTest {
         assertEquals(false, automaton.putNewString("&&fair"))
         assertEquals(false, automaton.putNewString("*ded1"))
     }
-
-    @Test
-    fun generateToken() {
-    }
 }

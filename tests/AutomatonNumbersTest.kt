@@ -42,8 +42,4 @@ internal class AutomatonNumbersTest {
         assertEquals(false, automaton.putNewString("1. 2"))
         assertEquals(false, automaton.putNewString("3 .42"))
     }
-
-    @Test
-    fun generateToken() {
-    }
 }

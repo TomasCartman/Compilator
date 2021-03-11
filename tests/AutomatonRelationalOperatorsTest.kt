@@ -38,9 +38,4 @@ internal class AutomatonRelationalOperatorsTest {
         assertEquals(false, automaton.putNewString("<>"))
         assertEquals(false, automaton.putNewString("><"))
     }
-
-    @org.junit.jupiter.api.Test
-    fun generateToken() {
-
-    }
 }
