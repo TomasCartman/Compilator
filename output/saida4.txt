@@ -1,0 +1,49 @@
+[1] PRE string
+[1] IDE Mensagem
+[1] REL =
+[1] CAD "Hello \" world\""
+[1] DEL ;
+[2] PRE print
+[2] DEL (
+[2] CAD "Digite o nome"
+[2] DEL )
+[2] DEL ;
+[3] PRE read
+[3] DEL (
+[3] IDE nome
+[3] DEL )
+[3] DEL ;
+[4] PRE print
+[4] DEL (
+[4] CAD "Digite a idade"
+[4] DEL )
+[4] DEL ;
+[5] PRE read
+[5] DEL (
+[5] IDE idade
+[5] DEL )
+[5] DEL ;
+[7] PRE if
+[7] DEL (
+[7] IDE idade
+[7] REL >=
+[7] NRO 150
+[7] DEL )
+[7] PRE print
+[7] DEL (
+[7] CAD "pode aposentar kkkk"
+[7] DEL )
+[7] DEL ;
+[8] PRE else
+[8] DEL {
+[9] PRE print
+[9] DEL (
+[9] CAD "vai trabalhar"
+[9] DEL )
+[9] DEL ;
+[10] IDE salario
+[10] REL =
+[10] IDE salario
+[10] DEL ;
+[11] DEL }
+

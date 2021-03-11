@@ -1,5 +1,6 @@
 package utils
 
+// Valid tokens
 const val RELOP = "REL"
 const val ID = "IDE"
 const val NUMBER = "NRO"
@@ -9,6 +10,14 @@ const val LOGOP = "LOG"
 const val COMMENT = "comment"
 const val STRING = "CAD"
 const val DELIM = "DEL"
+
+// Error tokens
+const val INSYM = "SIB"
+const val BFSTR = "CMF"
+const val BFNUM = "NMF"
+const val BFCOM = "CoMF"
+const val BFOPE = "OpMF"
+const val UNKNOWN = "Unknown"
 
 class ClassType private constructor(type: String) {
     var type: String = type
@@ -49,6 +58,30 @@ class ClassType private constructor(type: String) {
 
         fun createDelimiterType(): ClassType {
             return ClassType(DELIM)
+        }
+
+        fun createInvalidSymbolErrorType(): ClassType {
+            return ClassType(INSYM)
+        }
+
+        fun createBadFormattedStringErrorType(): ClassType {
+            return ClassType(BFSTR)
+        }
+
+        fun createBadFormattedNumberErrorType(): ClassType {
+            return ClassType(BFNUM)
+        }
+
+        fun createBadFormattedCommentErrorType(): ClassType {
+            return ClassType(BFCOM)
+        }
+
+        fun createBadFormattedOperatorErrorType(): ClassType {
+            return ClassType(BFOPE)
+        }
+
+        fun createUnknownErrorType(): ClassType {
+            return ClassType(UNKNOWN)
         }
     }
 }

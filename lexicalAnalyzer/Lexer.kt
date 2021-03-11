@@ -1,5 +1,6 @@
 package lexicalAnalyzer
 
+import utils.ClassType
 import utils.Token
 import java.io.File
 import java.io.FileWriter
@@ -15,11 +16,11 @@ class Lexer {
     private val automatonIdentifiers = AutomatonIdentifiers()
     private val automatonLogicalOperators = AutomatonLogicalOperators()
     private val automatonDelimiters = AutomatonDelimiters()
-    private val automatonString = AutomatonString()
     private val automatonComments = AutomatonComments()
 
     private lateinit var sourceCode: List<String>
     private var tokenList: MutableList<Token> = mutableListOf()
+    private var errorList: MutableList<Token> = mutableListOf()
     private var line = 0
     private var position = 0
     private var lookahead = 0
@@ -36,14 +37,20 @@ class Lexer {
         if(Files.exists(path) && Files.isDirectory(path)) {
             File(path.toString()).walk().forEach {
                 val fileName = it.name
-                if(fileName.startsWith("entrada5") && fileName.endsWith(".txt")) { // Put the startsWith to be 'entrada' instead of 'entrada3'
+                if(fileName.startsWith("entrada") && fileName.endsWith(".txt")) {
                     println("Reading file: $fileName")
                     sourceCode = readFileAsLinesUsingReadLines(it.absolutePath)
                     resetLexer()
                     checkLexeme()
-                    deleteFileIfExists(fileName)
+                    val fileNameNumber = fileName.substring(7, fileName.length -4)
+                    val outputFileName = "saida$fileNameNumber.txt"
+                    deleteFileIfExists(outputFileName)
                     for(token in tokenList) {
                         writeOnFile(fileName, "[${token.line}] ${token.type.type} ${token.value}\n")
+                    }
+                    writeOnFile(fileName, "\n")
+                    errorList.forEach { errorToken ->
+                        writeOnFile(fileName, "${errorToken.line} ${errorToken.type.type} ${errorToken.value}\n")
                     }
                 }
             }
@@ -54,7 +61,10 @@ class Lexer {
 
     private fun writeOnFile(fileName: String, text: String) {
         val directoryPath = Paths.get("output")
-        val filePath = Paths.get("output/$fileName")
+        val fileNameNumber = fileName.substring(7, fileName.length -4)
+        val outputFileName = "saida$fileNameNumber.txt"
+        val filePath = Paths.get("output/$outputFileName")
+
         if(Files.exists(directoryPath) && Files.isDirectory(directoryPath)) {
             try {
                 val fw = FileWriter(filePath.toFile(), true)
@@ -85,18 +95,19 @@ class Lexer {
         position = 0
         lookahead = 0
         tokenList = mutableListOf()
+        errorList = mutableListOf()
     }
 
     private fun checkLexeme() {
         var char = nextChar()
 
         while(char != null) {
-            if(char != ' ') {
+            if(!char.isWhitespace()) {
                 var lexeme = char.toString()
                 var token: Token? = null
                 var isLexemeValid: Boolean
                 var isLineComment = false
-                var i = 0 // Variable to be sure that at least a lexeme with length of two was tested
+                var isString = false
 
                 // Test the automatons until the last long valid lexeme
                 do {
@@ -122,12 +133,29 @@ class Lexer {
                     } else if(automatonDelimiters.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonDelimiters.generateToken()
-                    } else if(automatonString.putNewString(lexeme)) { // Change the way this automaton works
+                    } else if(lexeme == "\"") { // Change the way this automaton works
+                        var validString = true
+                        isString = true
                         do {
-                            val newChar = nextCharLookahead()
-                            token = automatonString.generateToken()
-                            lexeme += newChar
-                        } while (automatonString.putNewString(lexeme) && newChar != null)
+                            val newChar = nextChar()
+                            lexeme += newChar.toString()
+                            val newLookahead = nextCharLookahead()
+                            if(newLookahead == null && newChar != '"') {
+                                val type = ClassType.createBadFormattedStringErrorType()
+                                val token = Token(type, lexeme, line)
+                                errorList.add(token)
+                                validString = false
+                                break
+                            } else if(newChar == '\\' && newLookahead == '"') {
+                                lexeme += newLookahead.toString()
+                                jumpChar(1)
+                            }
+                        } while (newChar != '"')
+                        if(validString) {
+                            val type = ClassType.createStringType()
+                            val token = Token(type, lexeme, line + 1)
+                            tokenList.add(token)
+                        }
                         break
                     } else if(automatonComments.putNewString(lexeme)) {
                         token = automatonComments.generateToken()
@@ -147,29 +175,36 @@ class Lexer {
                             }
                         }
                         break
-                    } // else if, test others automatons
-                    else {
+                    } else {
                         isLexemeValid = false
                     }
 
                     val lookahead = nextCharLookahead() ?: break
-                    if(isLexemeValid && (!lookahead.isWhitespace())) {
+                    if(isLexemeValid || (!lookahead.isWhitespace()) && lexeme.length <= 2 ) {
                         lexeme += lookahead.toString()
                         isLexemeValid = true
-                        //i = 0
                     } else {
-                        i = 1
                         isLexemeValid = false
                     }
 
                 } while(isLexemeValid)
 
-                if(token != null && !isLineComment) {
+                if(token != null && !isLineComment) { // Valid token
                     token.line = line + 1
                     tokenList.add(token)
                     jumpChar(token.value.length - 1)
-                } else {
-                    if(!isLineComment && lexeme.isNotBlank()) println(lexeme)
+                } else { // Error token
+                    if(!isLineComment && !isString && lexeme.isNotBlank()) {
+                        if(lexeme.length == 1) {
+                            val type = ClassType.createInvalidSymbolErrorType()
+                            val token = Token(type, lexeme, line + 1)
+                            errorList.add(token)
+                        } else {
+                            val type = ClassType.createUnknownErrorType()
+                            val token = Token(type, lexeme, line + 1)
+                            errorList.add(token)
+                        }
+                    }
                 }
             }
 
@@ -239,15 +274,16 @@ class Lexer {
         do {
             val newChar = nextChar()
             val newLookaheadChar = nextCharLookahead()
-            if(newChar == null) break // Indicates a error here
+            if(newChar == null) {
+                val type = ClassType.createBadFormattedCommentErrorType()
+                val token = Token(type = type, line = line + 1)
+                errorList.add(token)
+                break
+            } // Indicates a error here
         } while(newChar != '*' || newLookaheadChar != '/')
         jumpChar(1)
     }
 }
-
-/*
-Cadeia de caracters: Definir symbols como no AutomatonKeywords, e dois estados para dentro dos parenteses para '\' e '"'
- */
 
 /*
 Delimetadores: ao testar o ponto '.', usar um strip() para garantir que não há espaços em branco entre o ponto
