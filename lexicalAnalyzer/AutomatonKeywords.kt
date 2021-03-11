@@ -3,28 +3,21 @@ package lexicalAnalyzer
 import utils.ClassType
 import utils.Token
 
-class AutomatonKeywords {
-    private var lexeme: String = ""
+class AutomatonKeywords : Automaton() {
     private val keywordsList = mutableListOf<String>()
 
     init {
         addKeywords()
     }
 
-    fun putNewString(s: String): Boolean {
-        lexeme = s
-
-        return testStringLexeme()
-    }
-
-    fun generateToken(): Token {
+    override fun generateToken(): Token {
         val type = ClassType.createKeywordType()
         val token = Token(type)
         token.value = lexeme
         return  token
     }
 
-    private fun testStringLexeme(): Boolean {
+    override fun testStringLexeme(): Boolean {
         return keywordsList.contains(lexeme)
     }
 

@@ -3,29 +3,16 @@ package lexicalAnalyzer
 import utils.ClassType
 import utils.Token
 
-class AutomatonNumbers {
-    private var lexeme: String = ""
-    private var state: Int = 0
+class AutomatonNumbers : Automaton() {
 
-    fun putNewString(s: String): Boolean {
-        resetAutomaton()
-        lexeme = s
-
-        return testStringLexeme()
-    }
-
-    fun generateToken(): Token {
+    override fun generateToken(): Token {
         val type = ClassType.createNumberType()
         val token = Token(type)
         token.value = lexeme
         return  token
     }
 
-    private fun resetAutomaton() {
-        state = 0
-    }
-
-    private fun testStringLexeme(): Boolean {
+    override fun testStringLexeme(): Boolean {
 
         for(char in lexeme) {
             when(state) {
