@@ -26,4 +26,4 @@
 4 CMF "teste
 7 CMF "mensagem );
 9 SIB @
-11 CoMF 
+11 CoMF /* exa869 mi processadores de linguagem de programacao

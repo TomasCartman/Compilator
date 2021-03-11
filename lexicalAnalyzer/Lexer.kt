@@ -133,7 +133,7 @@ class Lexer {
                     } else if(automatonDelimiters.putNewString(lexeme)) {
                         isLexemeValid = true
                         token = automatonDelimiters.generateToken()
-                    } else if(lexeme == "\"") { // Change the way this automaton works
+                    } else if(lexeme == "\"") {
                         var validString = true
                         isString = true
                         do {
@@ -171,6 +171,7 @@ class Lexer {
                                 skipComments()
                             }
                             else -> {
+                                token = null
                                 //    '*/' before opening comment, error
                             }
                         }
@@ -271,21 +272,19 @@ class Lexer {
     }
 
     private fun skipComments() {
+        jumpChar(1)
+        var lexeme = "/*"
         do {
             val newChar = nextChar()
             val newLookaheadChar = nextCharLookahead()
             if(newChar == null) {
                 val type = ClassType.createBadFormattedCommentErrorType()
-                val token = Token(type = type, line = line + 1)
+                val token = Token(type = type, value = lexeme ,line = line + 1)
                 errorList.add(token)
                 break
-            } // Indicates a error here
+            }
+            lexeme += newChar.toString()
         } while(newChar != '*' || newLookaheadChar != '/')
         jumpChar(1)
     }
 }
-
-/*
-Delimetadores: ao testar o ponto '.', usar um strip() para garantir que não há espaços em branco entre o ponto
-(na real, acho que nem vai funcionar)
- */

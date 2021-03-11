@@ -33,7 +33,6 @@ class AutomatonComments {
                 0 -> {
                     state = when(char) {
                         '/' -> 1
-                        '*' -> 2
                         else -> 6
                     }
                 }
@@ -44,10 +43,6 @@ class AutomatonComments {
                         else -> 6
                     }
                 }
-                2 -> {
-                    state = if(char == '/') 5
-                    else 6
-                }
                 else -> {
                     state = 6
                     break
@@ -55,6 +50,6 @@ class AutomatonComments {
             }
         }
 
-        return state == 3 || state == 4 || state == 5
+        return state == 3 || state == 4
     }
 }
