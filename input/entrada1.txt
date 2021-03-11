@@ -39,6 +39,8 @@ var int a = c + 1;
 var boolean isValid = true
 var string name = "name"
 
+var string test = "this is a \" error test
+
 i / c
 
 a * c

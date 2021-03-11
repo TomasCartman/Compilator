@@ -105,88 +105,53 @@ class Lexer {
             if(!char.isWhitespace()) {
                 var lexeme = char.toString()
                 var token: Token? = null
-                var isLexemeValid: Boolean
+                var isLexemeValid = true
                 var isLineComment = false
                 var isString = false
 
                 // Test the automatons until the last long valid lexeme
                 do {
+                    when {
+                        automatonKeywords.putNewString(lexeme) -> token = automatonKeywords.generateToken()
+                        automatonIdentifiers.putNewString(lexeme) -> token = automatonIdentifiers.generateToken()
+                        automatonRelationalOperators.putNewString(lexeme) -> token = automatonRelationalOperators.generateToken()
+                        automatonLogicalOperators.putNewString(lexeme) -> token = automatonLogicalOperators.generateToken()
+                        automatonArithmeticOperators.putNewString(lexeme) -> token = automatonArithmeticOperators.generateToken()
+                        automatonNumbers.putNewString(lexeme) -> token = automatonNumbers.generateToken()
+                        automatonDelimiters.putNewString(lexeme) -> token = automatonDelimiters.generateToken()
 
-                    if(automatonKeywords.putNewString(lexeme)) {
-                        isLexemeValid = true
-                        token = automatonKeywords.generateToken()
-                    } else if(automatonIdentifiers.putNewString(lexeme)) {
-                        isLexemeValid = true
-                        token = automatonIdentifiers.generateToken()
-                    } else if(automatonRelationalOperators.putNewString(lexeme)) {
-                        isLexemeValid = true
-                        token = automatonRelationalOperators.generateToken()
-                    } else if(automatonLogicalOperators.putNewString(lexeme)) {
-                        isLexemeValid = true
-                        token = automatonLogicalOperators.generateToken()
-                    } else if(automatonArithmeticOperators.putNewString(lexeme)) {
-                        isLexemeValid = true
-                        token = automatonArithmeticOperators.generateToken()
-                    } else if(automatonNumbers.putNewString(lexeme)) {
-                        isLexemeValid = true
-                        token = automatonNumbers.generateToken()
-                    } else if(automatonDelimiters.putNewString(lexeme)) {
-                        isLexemeValid = true
-                        token = automatonDelimiters.generateToken()
-                    } else if(lexeme == "\"") {
-                        var validString = true
-                        isString = true
-                        do {
-                            val newChar = nextChar()
-                            lexeme += newChar.toString()
-                            val newLookahead = nextCharLookahead()
-                            if(newLookahead == null && newChar != '"') {
-                                val type = ClassType.createBadFormattedStringErrorType()
-                                val token = Token(type, lexeme, line)
-                                errorList.add(token)
-                                validString = false
-                                break
-                            } else if(newChar == '\\' && newLookahead == '"') {
-                                lexeme += newLookahead.toString()
-                                jumpChar(1)
-                            }
-                        } while (newChar != '"')
-                        if(validString) {
-                            val type = ClassType.createStringType()
-                            val token = Token(type, lexeme, line + 1)
-                            tokenList.add(token)
+                        lexeme == "\"" -> {
+                            isString = true
+                            stringIdentifier(lexeme)
                         }
-                        break
-                    } else if(automatonComments.putNewString(lexeme)) {
-                        token = automatonComments.generateToken()
-                        when(token.value) {
-                            "//" -> {
-                                isLineComment = true
-                                line += 1
-                                position = 0
-                                lookahead = 0
-                            }
-                            "/*" -> {
-                                isLineComment = true
-                                skipComments()
-                            }
-                            else -> {
-                                token = null
-                                //    '*/' before opening comment, error
+
+                        automatonComments.putNewString(lexeme) -> {
+                            token = automatonComments.generateToken()
+                            when(token.value) {
+                                "//" -> {
+                                    isLineComment = true
+                                    line += 1
+                                    position = 0
+                                    lookahead = 0
+                                }
+                                "/*" -> {
+                                    isLineComment = true
+                                    skipComments()
+                                }
+                                else -> {
+                                    token = null
+                                    //    '*/' before opening comment, error
+                                }
                             }
                         }
-                        break
-                    } else {
-                        isLexemeValid = false
+                        else -> isLexemeValid = false
                     }
 
                     val lookahead = nextCharLookahead() ?: break
                     if(isLexemeValid || (!lookahead.isWhitespace()) && lexeme.length <= 2 ) {
                         lexeme += lookahead.toString()
                         isLexemeValid = true
-                    } else {
-                        isLexemeValid = false
-                    }
+                    } else isLexemeValid = false
 
                 } while(isLexemeValid)
 
@@ -198,12 +163,12 @@ class Lexer {
                     if(!isLineComment && !isString && lexeme.isNotBlank()) {
                         if(lexeme.length == 1) {
                             val type = ClassType.createInvalidSymbolErrorType()
-                            val token = Token(type, lexeme, line + 1)
-                            errorList.add(token)
+                            val validToken = Token(type, lexeme, line + 1)
+                            errorList.add(validToken)
                         } else {
                             val type = ClassType.createUnknownErrorType()
-                            val token = Token(type, lexeme, line + 1)
-                            errorList.add(token)
+                            val errorToken = Token(type, lexeme, line + 1)
+                            errorList.add(errorToken)
                         }
                     }
                 }
@@ -286,5 +251,30 @@ class Lexer {
             lexeme += newChar.toString()
         } while(newChar != '*' || newLookaheadChar != '/')
         jumpChar(1)
+    }
+
+    private fun stringIdentifier(lexemeCode: String) {
+        var validString = true
+        var lexeme = lexemeCode
+        do {
+            val newChar = nextChar()
+            lexeme += newChar.toString()
+            val newLookahead = nextCharLookahead()
+            if(newLookahead == null && newChar != '"') {
+                val type = ClassType.createBadFormattedStringErrorType()
+                val token = Token(type, lexeme, line + 1)
+                errorList.add(token)
+                validString = false
+                break
+            } else if(newChar == '\\' && newLookahead == '"') {
+                lexeme += newLookahead.toString()
+                jumpChar(1)
+            }
+        } while (newChar != '"')
+        if(validString) {
+            val type = ClassType.createStringType()
+            val token = Token(type, lexeme, line + 1)
+            tokenList.add(token)
+        }
     }
 }
