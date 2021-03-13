@@ -162,13 +162,16 @@ class Lexer {
                 } else { // Error token
                     if(!isLineComment && !isString && lexeme.isNotBlank()) {
                         if(lexeme.length == 1) {
-                            val type = ClassType.createInvalidSymbolErrorType()
-                            val validToken = Token(type, lexeme, line + 1)
-                            errorList.add(validToken)
+                            val type = if(lexeme.any { it == '|' || it =='&' }) ClassType.createBadFormattedOperatorErrorType()
+                                    else ClassType.createInvalidSymbolErrorType()
+
+                            val errorToken = Token(type, lexeme, line + 1)
+                            errorList.add(errorToken)
                         } else {
                             val type = ClassType.createUnknownErrorType()
                             val errorToken = Token(type, lexeme, line + 1)
                             errorList.add(errorToken)
+                            jumpChar(1)
                         }
                     }
                 }

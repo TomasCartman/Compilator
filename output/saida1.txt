@@ -221,8 +221,8 @@
 [75] DEL ;
 [76] DEL }
 
-17 SIB |
-18 SIB &
-20 SIB |
-21 SIB &
+17 OpMF |
+18 OpMF &
+20 OpMF |
+21 OpMF &
 42 CMF "this is a \" error test
