@@ -1,6 +1,6 @@
-package tests
+package tests.lexicalAnalyzer.automatons
 
-import lexicalAnalyzer.AutomatonRelationalOperators
+import lexicalAnalyzer.automatons.AutomatonRelationalOperators
 import org.junit.jupiter.api.Assertions.*
 
 internal class AutomatonRelationalOperatorsTest {

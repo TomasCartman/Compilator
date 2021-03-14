@@ -1,4 +1,4 @@
-package lexicalAnalyzer
+package lexicalAnalyzer.automatons
 
 import utils.Token
 

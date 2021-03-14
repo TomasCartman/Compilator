@@ -1,5 +1,6 @@
 package lexicalAnalyzer
 
+import lexicalAnalyzer.automatons.*
 import utils.ClassType
 import utils.Token
 import java.io.File

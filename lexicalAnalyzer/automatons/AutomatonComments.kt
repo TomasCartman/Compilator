@@ -1,4 +1,4 @@
-package lexicalAnalyzer
+package lexicalAnalyzer.automatons
 
 import utils.ClassType
 import utils.Token
@@ -19,24 +19,31 @@ class AutomatonComments : Automaton() {
             when(state) {
                 0 -> {
                     state = when(char) {
-                        '/' -> 1
-                        else -> 6
+                        '/' -> States.SLASH.state
+                        else -> States.INVALID.state
                     }
                 }
-                1 -> {
+                States.SLASH.state -> {
                     state = when(char) {
-                        '/' -> 3
-                        '*' -> 4
-                        else -> 6
+                        '/' -> States.SINGLE_LINE_COMMENT.state
+                        '*' -> States.MULTI_LINE_COMMENT.state
+                        else -> States.INVALID.state
                     }
                 }
                 else -> {
-                    state = 6
+                    state = States.INVALID.state
                     break
                 }
             }
         }
 
-        return state == 3 || state == 4
+        return state in States.SINGLE_LINE_COMMENT.state..States.MULTI_LINE_COMMENT.state
+    }
+
+    private enum class States(val state: Int) {
+        SLASH(1),
+        SINGLE_LINE_COMMENT(2),
+        MULTI_LINE_COMMENT(3),
+        INVALID(4)
     }
 }

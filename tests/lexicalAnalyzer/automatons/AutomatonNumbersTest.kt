@@ -1,6 +1,6 @@
-package tests
+package tests.lexicalAnalyzer.automatons
 
-import lexicalAnalyzer.AutomatonNumbers
+import lexicalAnalyzer.automatons.AutomatonNumbers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
