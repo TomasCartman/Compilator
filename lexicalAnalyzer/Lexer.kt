@@ -43,6 +43,7 @@ class Lexer {
                     sourceCode = readFileAsLinesUsingReadLines(it.absolutePath)
                     resetLexer()
                     checkLexeme()
+
                     val fileNameNumber = fileName.substring(7, fileName.length -4)
                     val outputFileName = "saida$fileNameNumber.txt"
                     deleteFileIfExists(outputFileName)
@@ -50,6 +51,9 @@ class Lexer {
                         writeOnFile(fileName, "[${token.line}] ${token.type.type} ${token.value}\n")
                     }
                     writeOnFile(fileName, "\n")
+                    if(errorList.isEmpty()) {
+                        writeOnFile(fileName, "O código foi compilado com sucesso")
+                    }
                     errorList.forEach { errorToken ->
                         writeOnFile(fileName, "${errorToken.line} ${errorToken.type.type} ${errorToken.value}\n")
                     }

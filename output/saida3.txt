@@ -70,3 +70,4 @@
 [24] DEL }
 [26] DEL }
 
+O código foi compilado com sucesso

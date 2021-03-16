@@ -47,3 +47,4 @@
 [10] DEL ;
 [11] DEL }
 
+O código foi compilado com sucesso
