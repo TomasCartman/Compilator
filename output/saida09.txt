@@ -1,0 +1,38 @@
+[8] IDE num1
+[8] IDE todos_tutores
+[8] IDE soma
+[8] IDE q123
+[12] NRO 123
+[12] NRO 1.2
+[12] NRO 23
+[12] DEL .
+[12] NRO 987
+[16] CAD "texto correto"
+[16] CAD "@#$:^&*"
+[20] ART +
+[20] ART -
+[20] ART *
+[20] ART /
+[20] ART ++
+[20] ART --
+[20] REL ==
+[20] REL !=
+[20] REL >
+[20] REL >=
+[20] REL <
+[20] REL <=
+[20] REL =
+[20] LOG &&
+[20] LOG ||
+[20] LOG !
+[24] DEL ;
+[24] DEL ,
+[24] DEL (
+[24] DEL )
+[24] DEL {
+[24] DEL }
+[24] DEL [
+[24] DEL ]
+[24] DEL .
+
+O código foi compilado com sucesso

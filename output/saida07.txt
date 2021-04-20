@@ -1,0 +1,25 @@
+[2] PRE var
+[3] DEL {
+[4] PRE string
+[4] IDE nome
+[4] REL =
+[4] CAD "nome pro'prio "
+[4] DEL ;
+[5] PRE string
+[5] IDE palavra
+[5] REL =
+[5] CAD ""
+[5] DEL ;
+[6] PRE string
+[6] IDE palavra2
+[6] REL =
+[6] CAD " "
+[6] DEL ;
+[7] PRE string
+[7] IDE sobrenome
+[7] REL =
+[7] CAD " sobre "
+[7] IDE tutores
+[9] DEL }
+
+7 CMF ";
