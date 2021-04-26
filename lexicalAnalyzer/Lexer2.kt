@@ -19,20 +19,54 @@ class Lexer2(private val sourceCode: String) {
         var lookaheadChar = lexerHelper.getNextLookaheadChar()
         var lexeme = char.toString()
         var token: Token? = null
+        while(char != null && char.isWhitespace()) {
+            //lexerHelper.jumpLine()
+            //lexerHelper.upNewLine()
+            char = lexerHelper.getNextChar()
+            lexeme = char.toString()
+        }
         while (char != null && !char.isWhitespace()) {
             if (char.toInt() == AsciiTable.Slash.decValue &&
                 lookaheadChar != null && lookaheadChar.toInt() == AsciiTable.Slash.decValue) {
 
                 lexerHelper.jumpLine()
+                //lexerHelper.upNewLine()
+                char = lexerHelper.getNextChar()
+                lookaheadChar = lexerHelper.getNextLookaheadChar()
+                lexeme = char.toString()
+            } else {
+                if (token != null) {
+                    val newToken = testAutomaton(lexeme)
+                    if(newToken == null) {
+                        token.line = lexerHelper.line -1
+                        lexerHelper.returnChar()
+                        return token
+                    } else {
+                        token = newToken
+                    }
+                } else {
+                    token = testAutomaton(lexeme)
+                    token?.line = lexerHelper.line
+                }
+
+                /*
+                if( token != null) {
+                    token.line = lexerHelper.line - 1
+                }
+                 */
+
+                char = lexerHelper.getNextChar()
+                if (char?.toInt() == AsciiTable.EndOfLine.decValue) {
+                    //char = lexerHelper.getNextChar()
+                    //lexerHelper.upNewLine()
+                    token?.line = lexerHelper.line
+                    return token
+                }
+                lookaheadChar = lexerHelper.getNextLookaheadChar()
+                lexeme += char
             }
-
-            token = testAutomaton(lexeme)
-
-
-            char = lexerHelper.getNextChar()
-            lexeme += char
         }
-        println(token)
+        //println(token)
         return token
     }
 
@@ -51,6 +85,7 @@ class Lexer2(private val sourceCode: String) {
 
     private enum class AsciiTable(val decValue: Int) {
         Space(32),
-        Slash(47)
+        Slash(47),
+        EndOfLine(10)
     }
 }

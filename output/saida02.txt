@@ -43,8 +43,7 @@
 [21] IDE numero_real
 [21] REL =
 [21] NRO 1.123456
-[21] DEL .
-[21] NRO 789
+[21] NRO 89
 [22] IDE numero_real2
 [22] REL =
 [22] NRO 1234
@@ -54,4 +53,5 @@
 [23] DEL }
 
 20 SIB _
-22 Unknown @56
+21 Unknown .789
+22 Unknown @567

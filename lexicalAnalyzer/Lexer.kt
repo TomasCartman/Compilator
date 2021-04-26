@@ -1,15 +1,12 @@
 package lexicalAnalyzer
 
 import lexicalAnalyzer.automatons.*
+import parser.Parser
 import utils.ClassType
 import utils.Token
 import java.io.File
-import java.io.FileWriter
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Paths
 
-class Lexer {
+class Lexer(private val fileName: String) : Parser.LexicalAnalyzerProvider{
     private val automatonRelationalOperators = AutomatonRelationalOperators()
     private val automatonNumbers = AutomatonNumbers()
     private val automatonKeywords = AutomatonKeywords()
@@ -26,19 +23,22 @@ class Lexer {
     private var position = 0
     private var lookahead = 0
 
-    fun main() {
-        readAllInputFiles()
+    init {
+        sourceCode = readFileAsLinesUsingReadLines(fileName)
+        checkLexeme()
+        //readAllInputFiles()
     }
 
     private fun readFileAsLinesUsingReadLines(fileName: String): List<String>
             = File(fileName).readLines()
 
+    /*
     private fun readAllInputFiles() {
         val path = Paths.get("input").toAbsolutePath()
         if(Files.exists(path) && Files.isDirectory(path)) {
             File(path.toString()).walk().forEach {
                 val fileName = it.name
-                if(fileName.startsWith("entrada") && fileName.endsWith(".txt")) {
+                if(fileName.startsWith("entrada02") && fileName.endsWith(".txt")) {
                     println("Reading file: $fileName")
                     sourceCode = readFileAsLinesUsingReadLines(it.absolutePath)
                     resetLexer()
@@ -48,6 +48,7 @@ class Lexer {
                     val outputFileName = "saida$fileNameNumber.txt"
                     deleteFileIfExists(outputFileName)
                     for(token in tokenList) {
+                        println("line: ${token.line} - type: ${token.type.type} - value: ${token.value}")
                         writeOnFile(fileName, "[${token.line}] ${token.type.type} ${token.value}\n")
                     }
                     writeOnFile(fileName, "\n")
@@ -94,7 +95,7 @@ class Lexer {
         val filePath = Paths.get("output/$fileName")
         Files.deleteIfExists(filePath)
     }
-
+*/
     private fun resetLexer() {
         line = 0
         position = 0
@@ -153,12 +154,17 @@ class Lexer {
                     }
 
                     val lookahead = nextCharLookahead() ?: break
-                    if(isLexemeValid || (!lookahead.isWhitespace()) && lexeme.length <= 2 ) {
+                    if(isLexemeValid || (!lookahead.isWhitespace()) && lexeme.length <= 3 ) {
                         lexeme += lookahead.toString()
                         isLexemeValid = true
                     } else isLexemeValid = false
 
                 } while(isLexemeValid)
+
+                val actualCharLookahead = actualNextCharLookahead()
+                if(token != null && token.type.type == "DEL" && actualCharLookahead != null && actualCharLookahead.isDigit()) {
+                    token = null
+                }
 
                 if(token != null && !isLineComment) { // Valid token
                     token.line = line + 1
@@ -236,6 +242,14 @@ class Lexer {
         }
     }
 
+    private fun actualNextCharLookahead(): Char? {
+        return if(sourceCode.size > line && sourceCode[line].length > position+1) {
+            sourceCode[line][position+1]
+        } else {
+            null
+        }
+    }
+
     private fun jumpChar(jumpSize: Int) {
         var i = jumpSize
         while(i > 0) {
@@ -284,5 +298,13 @@ class Lexer {
             val token = Token(type, lexeme, line + 1)
             tokenList.add(token)
         }
+    }
+
+    override fun nextToken(): Token? {
+        return if(tokenList.isNotEmpty()) {
+            val token = tokenList.removeFirst()
+            println(token)
+            token
+        } else null
     }
 }

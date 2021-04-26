@@ -1,7 +1,9 @@
 package lexicalAnalyzer
 
 class LexerHelper(private val sourceCode: String) {
-    private var line = 1
+    private var _line = 1
+    val line: Int
+        get() = _line
     private var position = 0
     private var lookahead = 0
 
@@ -11,7 +13,7 @@ class LexerHelper(private val sourceCode: String) {
             position += 1
             lookahead = position
             if (char.toInt() == 10) {
-                line += 1
+                _line += 1
             }
             return  char
         }
@@ -35,6 +37,21 @@ class LexerHelper(private val sourceCode: String) {
         while (char.toInt() != 10) {
             char = getNextChar() ?: return
         }
-        line += 1
+        getNextChar() ?: return
+        //_line += 1
+    }
+
+    fun returnChar() {
+        if(position < sourceCode.length) {
+            position -= 1
+            val char = sourceCode[position]
+            if(char.toInt() == 10) {
+                _line -= 1
+            }
+        }
+    }
+
+    fun upNewLine() {
+        _line += 1
     }
 }
