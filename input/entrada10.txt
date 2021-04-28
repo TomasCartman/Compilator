@@ -4,7 +4,7 @@ procedure start {
 var { int a; }
 
 // Multipla atribuições unica linha
-var { int a=2, b=3, c=a; }
+var { int a = 2, b = 3, c = a; }
 
 // Multiplas declarações unica linha
 var { int a; string b; real c; }

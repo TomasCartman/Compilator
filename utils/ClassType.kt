@@ -1,15 +1,6 @@
 package utils
 
-// Valid tokens
-const val RELOP = "REL"
-const val ID = "IDE"
-const val NUMBER = "NRO"
-const val KEYWORD = "PRE"
-const val AROP = "ART"
-const val LOGOP = "LOG"
-const val COMMENT = "comment"
-const val STRING = "CAD"
-const val DELIM = "DEL"
+
 
 // Error tokens
 const val INSYM = "SIB"
@@ -23,6 +14,17 @@ class ClassType private constructor(type: String) {
     var type: String = type
 
     companion object {
+        // Valid tokens
+        const val RELOP = "REL"
+        const val ID = "IDE"
+        const val NUMBER = "NRO"
+        const val KEYWORD = "PRE"
+        const val AROP = "ART"
+        const val LOGOP = "LOG"
+        const val COMMENT = "comment"
+        const val STRING = "CAD"
+        const val DELIM = "DEL"
+
 
         fun createRelOpType(): ClassType {
             return ClassType(RELOP)

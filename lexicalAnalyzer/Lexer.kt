@@ -303,8 +303,12 @@ class Lexer(private val fileName: String) : Parser.LexicalAnalyzerProvider{
     override fun nextToken(): Token? {
         return if(tokenList.isNotEmpty()) {
             val token = tokenList.removeFirst()
-            println(token)
+            //println(token)
             token
         } else null
+    }
+
+    override fun returnToken(token: Token) {
+        tokenList.add(0, token)
     }
 }
