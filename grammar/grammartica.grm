@@ -1,0 +1,381 @@
+﻿"Name"     = 'Enter the name of the grammar'
+"Author"   = 'Enter your name'
+"Version"  = 'The version of the grammar and/or language'
+"About"    = 'A short description of the grammar'
+           
+"Case Sensitive" = True
+"Start Symbol" = <Init>
+
+! -------------------------------------------------
+! Character Sets
+! -------------------------------------------------
+
+{WS}           = {Whitespace} - {CR} - {LF}
+{String Chars} = {Printable} + {HT} - ["\]
+
+! -------------------------------------------------
+! Terminals
+! -------------------------------------------------
+
+! The following defines the Whitespace terminal using the {WS}
+! set - which excludes the carriage return and line feed 
+! characters
+
+Whitespace    = {WS}+
+NewLine       = {CR}{LF} | {CR} | {LF}
+              
+{Id Head}        = {Letter} + [_]
+{Id Tail}        = {Id Head} + {Digit}
+Identifier    = {Id Head}{Id Tail}*
+              
+DecimalLiteral = {Digit}+              
+RealLiteral = {Digit}+'.'{Digit}+
+StringLiteral = '"' ( {String Chars} | '\' {Printable} )* '"'
+              
+
+! ----------------------------------------------------------------- Comments
+
+Comment Line = '//'
+Comment Start = '/*'
+Comment End = '*/'
+
+
+! -------------------------------------------------
+! Rules
+! -------------------------------------------------
+
+! The following rule defines a series of newline tokens.
+! Use this rule rather than the newline terminal.
+
+<nl>     ::= NewLine <nl>          !One or more
+          |  NewLine
+
+<nl Opt> ::= NewLine <nl Opt>      !Zero or more
+          |  <>
+
+! <nl opt> removes blank lines before first statement
+
+<Init> ::= 'procedure' 'start' '{' <Start> '}' <nl opt>
+        
+
+<Start>   ::= <nl opt> <Program> <nl opt> <Start> | <>
+           
+
+<Program> ::= <Statement>
+           
+          
+! ===================================================================
+! Types
+! ===================================================================
+
+<Type> ::= boolean 
+        | <Scalar>
+        | string
+        
+<Scalar> ::= int
+          | real
+          
+<Literal> ::= true
+            | false
+            | DecimalLiteral
+            | RealLiteral
+            | StringLiteral
+            
+<Primary> ::= Identifier
+           | <Literal>
+          
+! ===================================================================
+! Variable Declaration
+! ===================================================================
+
+<Var Decl>  ::= var '{' <TypedVariable> '}'
+             |  var '{' <nl opt> <TypedVariable> '}'
+             |  var '{' <nl opt> <TypedVariable> <nl opt> '}'
+             |  var '{' <TypedVariable> <nl opt> '}'
+             | const '{' <TypedConst> '}'
+             | const '{' <nl opt> <TypedConst> '}'
+             | const '{' <nl opt> <TypedConst> <nl opt>  '}'
+             | const '{' <TypedConst> <nl opt> '}'
+             
+             
+<TypedVariable> ::= <Type> <Variables> ';' <nl opt>
+                 |  <Type> <Variables> ';' <TypedVariable> <nl opt>
+                 |  <Type> <Variables> ';' <nl opt> <TypedVariable> <nl opt>
+
+
+<Variables> ::=  <VariableDeclarator>
+              |  <VariableDeclarator> ',' <Variables>
+              |  <VariableDeclarator> ',' <nl opt> <Variables>
+
+               
+<VariableDeclarator> ::= Identifier
+                      | Identifier '=' <VariableInit>
+                      | Identifier '=' <Call Func>
+                      | Identifier '=' <StructUsage>
+                      | Identifier '=' <VariableScopeType> '.' Identifier
+                      | <ArrayUsage> '=' '{' <VarArgs> '}'
+                      | <ArrayUsage> '=' '{' <VarArgs> '}'
+                      | <ArrayUsage>
+                      
+                          
+<VariableInit> ::= <Expression>
+                
+
+<TypedConst> ::= <Type> <Constants> ';' <nl opt>
+              |  <Type> <Constants> ';' <nl opt> <TypedConst> <nl opt>
+              |  <Type> <Constants> ';' <TypedConst> <nl opt>
+              
+
+<Constants> ::= <ConstDeclarator> <nl opt> 
+             |  <ConstDeclarator> ',' <Constants> <nl opt> 
+             |  <ConstDeclarator> ',' <nl opt> <Constants> <nl opt> 
+                
+
+<ConstDeclarator> ::= Identifier '=' <Literal>
+
+                   
+<ArrayUsage> ::= Identifier '[' <Primary> ']'
+              | Identifier '[' <Primary> ']' '[' <Primary> ']'
+
+
+<StructUsage> ::= Identifier '.' Identifier
+
+
+<VariableUsage> ::= <VariableDeclarator> ';'
+                 | <StructUsage> ';'
+                 | <StructUsage> '=' <VariableInit> ';'
+                 | <StructUsage> '=' <Call Func> ';'
+                 | <StructUsage> '=' <StructUsage> ';'
+                 | <StructUsage> '=' <ArrayUsage> ';'
+                 | <ArrayUsage> ';'
+                 | <ArrayUsage> '=' <Primary> ';'
+                 | <ArrayUsage> '=' <StructUsage> ';'
+                 | <ArrayUsage> '=' <ArrayUsage> ';'
+                 
+
+      
+<VariableScope> ::= <VariableScopeType> '.' <VariableUsage>
+                 | <VariableScopeType> '.' Identifier '=' Identifier ';'
+                 | <VariableScopeType> '.' Identifier '=' <StructUsage> ';'
+                 | <VariableScopeType> '.' Identifier '=' <ArrayUsage> ';'
+                 | <VariableScopeType> '.'  Identifier '=' <VariableScopeType> '.' Identifier ';'
+                 | <VariableScopeType> '.'  <ArrayUsage> '=' <VariableScopeType> '.' Identifier ';'
+                 | <VariableScopeType> '.'  Identifier '=' <VariableScopeType> '.' <ArrayUsage> ';'
+                 | <StructUsage> '=' <VariableScopeType> '.' Identifier ';'
+                 | <ArrayUsage>  '=' <VariableScopeType> '.' Identifier ';'
+
+
+<VariableScopeType> ::= 'local'
+                     | 'global'
+
+
+<Mod> ::= var
+       | const    
+       
+
+<VarArgs> ::= <VarArg> | <VarArg> ',' <VarArgs> | <>
+             
+<VarArg> ::= Identifier | <Literal>
+             
+
+! ===================================================================
+! Struct  Declaration
+! ===================================================================
+
+<Struct Decl> ::= typedef struct '{' <nl opt> <Struct Def> '}' Identifier ';' | typedef struct extends Identifier '{' <nl opt> <Struct Def> '}' Identifier ';'
+
+<Struct Def> ::= <Var Decl> <nl opt> <Struct Def>
+               | <Var Decl> <nl opt>
+        
+! ===================================================================
+! Function  Declaration
+! ===================================================================
+
+<Func Decl>  ::= <Func ID> '(' <Params>  ')' 
+               | <Func ID> '(' <Id List> ')'
+               | <Func ID> '(' ')'
+
+
+<Params>     ::= <Param> ',' <Params>
+               | <Param>
+               
+<Param>      ::= <Type> Identifier
+               
+<Types>      ::= <Type>  ',' <Types>
+               | <Type> 
+   
+<Id List>    ::= Identifier ',' <Id List>
+               | Identifier
+
+<Func ID>    ::= <Type> Identifier 
+                     
+
+! ===================================================================
+! Expression  Declaration
+! ===================================================================
+
+<Expression> ::= <OrExpression>
+               
+<OrExpression> ::= <AndExpression> '||' <OrExpression>
+                | <AndExpression>
+
+<AndExpression> ::= <EqualityExpression> '&&' <AndExpression>
+                 | <EqualityExpression>
+                 
+<EqualityExpression> ::= <CompareExpression> '==' <EqualityExpression> 
+                       | <CompareExpression> '!=' <EqualityExpression> 
+                       | <CompareExpression>
+                       
+<CompareExpression> ::= <AddExpression> '<'  <CompareExpression>
+                     | <AddExpression> '>'  <CompareExpression>
+                     | <AddExpression> '<=' <CompareExpression>
+                     | <AddExpression> '>=' <CompareExpression>
+                     | <AddExpression>
+        
+<AddExpression> ::= <MultiplicationExpression> '+' <AddExpression>
+                 | <MultiplicationExpression> '-' <AddExpression>
+                 | <MultiplicationExpression>
+
+<MultiplicationExpression> ::= <UnaryExpression>'*' <MultiplicationExpression>
+                            | <UnaryExpression> '/' <MultiplicationExpression>
+                            | <UnaryExpression>
+        
+<UnaryExpression> ::= '!' <UnaryExpression>
+                   | <ObjectExpression>
+                  
+<ObjectExpression> ::= <MethodExpression>
+                   ! | <PrimaryArrayCreationExpression>
+                    
+                       
+! <PrimaryArrayCreationExpression> ::= <>!Empty
+                      
+            
+<MethodExpression> ::= <PrimaryExpression>
+                    
+<PrimaryExpression> ::= <Primary>
+                     | '(' <Expression> ')'
+                     
+           
+                                      
+
+! ===================================================================
+! While Loop
+! ===================================================================
+
+<While> ::= 'while' '(' <Expression> ')' <Statement>
+         
+! ===================================================================
+! If-Else
+! ===================================================================
+
+<if> ::=  if '(' <Expression> ')' <Statement>
+         | if '(' <Expression> ')' <Statement> else <Statement>  
+
+! ===================================================================
+! Read
+! ===================================================================
+<Read Statement>   ::= 'read' '(' <Exp_read> ')'';'
+
+<Exp_read> ::= Identifier <More Readings> 
+            | <ArrayUsage> <More Readings>                
+            | <StructUsage><More Readings>
+                       
+<More Readings> ::= ',' <Exp_read> 
+                 | <>
+                 
+
+
+! ===================================================================
+! Print
+! ===================================================================
+<Print Statement> ::= 'print' '(' <Exp_print> ')'';' 
+                   
+<Exp_print> ::= Identifier <More Expressions> 
+             | <ArrayUsage> <More Expressions>  
+             | StringLiteral <More Expressions> 
+             | <StructUsage> <More Expressions>
+                       
+<More Expressions> ::= ',' <Exp_print> 
+                    | <>
+        
+
+!* ================================================== *!
+!*         Declaração de Functions e Procedures       *!
+!* ================================================== *! 
+
+!<Decls> ::= <Decl> <Decls> | <>
+
+<Decl> ::= <Function Decl> | <Procedure Decl> 
+ 
+<Function Decl> ::= 'function' <Type> Identifier '(' <Params> ')' <Block Func>
+                 
+<Procedure Decl> ::= 'procedure' Identifier '(' <Params> ')' <Block Proc>
+                  
+<Params>     ::= <Param> | <Param> ',' <Params> | <>
+               
+<Param> ::= <Type> Identifier
+         
+<Block Func> ::= '{' <nl Opt> <StatementsList> <nl Opt> <Return> <nl Opt>  '}' <nl Opt> 
+
+<Block Proc> ::= '{' <nl Opt> <StatementsList> <nl Opt> '}' <nl Opt>
+
+!* ================================================== *!
+!*       Corpo e chamada de Function/Procedures       *!
+!* ================================================== *! 
+         
+!<Body List> ::=  <Body> <Body List> | <>
+
+!<Body> ::= Identifier 
+!         | <Return>
+!         | <Call Func> ';'
+!         | <Var Decl>
+!         !| <Expression>
+!         | <Read Statement>
+!         | <Print Statement>
+!         | <nl opt>                 
+          
+<Return> ::= 'return' ';' <nl Opt>
+           | 'return' Identifier ';' <nl Opt>
+           | 'return' 'true' ';' <nl Opt>
+           | 'return' 'false' ';' <nl Opt>
+           | 'return' <Call Func> ';' <nl Opt>
+           | 'return' DecimalLiteral ';' <nl Opt>
+           | 'return' RealLiteral ';' <nl Opt>
+           | 'return' StringLiteral ';' <nl Opt>
+           !| 'return' <Expression> ';' <nl Opt>
+           
+
+<Call Func> ::= Identifier '(' <Args> ')'
+
+<Args> ::= <Arg> | <Arg> ',' <Args> | <>
+             
+<Arg> ::= <Call Func>
+        | <Primary>
+       
+! ===================================================================
+! Statement
+! =================================================================== 
+
+
+<Statement> ::= '{' <nl opt> <StatementsList> <nl opt> '}' | '{' '}' | <nl opt> <SimpleStatament> <nl opt>
+             
+<StatementsList> ::=  <Statement> <StatementsList> 
+                  |
+             
+<StatementList> ::=  <SimpleStatament>
+                | <if>
+                | <while> 
+
+ 
+<SimpleStatament> ::=  <Read Statement>
+                  | <Print Statement> 
+                  | <VariableUsage>
+                  | <VariableScope>
+                  | <Decl>
+                  | <Struct Decl>
+                  | <Var Decl> 
+                  | <Call Func> ';'
+                  |<if>
+                  |<While>                  
+        
+!* ================================================== *!

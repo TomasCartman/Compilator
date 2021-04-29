@@ -31,12 +31,12 @@ var { int a = b; }
 var { int a = fun(); }
 
 // Declaração recebendo retorno de função com parâmetros
-var { int a = fun (1, b, 3); }
+var { int a = fun (1, b , 3); }
 
 // Declarações recebendo mais de uma variavel com mais de uma função
 var {
-    int a = fun (1, b, 3);
-    string b = fun("oi'"), c = novaFun ();
+    int a = fun (1, b , 3);
+    string b = fun("oi"), c = novaFun ();
 }
 
 // Declaração recebendo variavel de uma struct

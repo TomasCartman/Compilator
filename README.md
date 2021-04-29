@@ -1,7 +1,9 @@
 # Compiler
 A compiler project to compile a language proposed by some teachers for the learning of the process of compilation
 
-This compiler is being made in **kotlin** language and for now it has only the lexical analyzer part
+This compiler is being made in **kotlin** language and for now it has only the lexical analyzer part complete and the parser in progress
+
+Another thing, I would say this is the one of the worst code I ever wrote. **Do not waste your time trying to understand it.** 
 
 ## Lexical structure of language
 | Description  | Expressions  |

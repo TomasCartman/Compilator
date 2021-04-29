@@ -84,11 +84,14 @@ class Parser {
                         }
                     }
                 } else if (token != null && token.value == "const") { // Const declaration
+                    consumedTokens.add(token)
                     token = lexer.nextToken()
                     if (token != null && token.value == "{") {
+                        consumedTokens.add(token)
                         typedConst()
                         token = lexer.nextToken()
                         if (token != null && token.value == "}") {
+                            consumedTokens.add(token)
                             //return
                         }
                     }
@@ -98,6 +101,112 @@ class Parser {
 
                 } else if (token != null && token.value == "while") {
                     whileFunction()
+                } else if(token != null && token.type.type == ClassType.ID) {
+                    var lookaheadToken = lexer.nextToken()
+                    if(lookaheadToken != null && (lookaheadToken.value == ";" || lookaheadToken.value == "=" ||
+                                lookaheadToken.value == "[" || lookaheadToken.value == ".")) { // variableUsage
+                        if(lookaheadToken.value == "=") { // Simple variable
+                            lexer.returnToken(lookaheadToken)
+                            lexer.returnToken(token)
+                            variableDeclarator()
+                            token = lexer.nextToken()
+                            if(token != null && token.value == ";") {
+                                consumedTokens.add(token)
+                                token = lexer.nextToken() // CHECK IF THIS IS RIGHT
+                            }
+                        } else if(lookaheadToken.value == ".") { // Struct
+                            consumedTokens.add(token)
+                            consumedTokens.add(lookaheadToken)
+                            token = lexer.nextToken()
+                            if(token != null && token.type.type == ClassType.ID) {
+                                consumedTokens.add(token)
+                                token = lexer.nextToken()
+                                if (token != null && token.value == ";") {
+                                    consumedTokens.add(token)
+                                    token = lexer.nextToken()
+                                } else if (token != null && token.value == "=") {
+                                    consumedTokens.add(token)
+                                    token = lexer.nextToken()
+                                    if (token != null && token.type.type == ClassType.ID) {
+                                        consumedTokens.add(token)
+                                        lookaheadToken = lexer.nextToken()
+                                        if (lookaheadToken != null && lookaheadToken.value == "(") {
+                                            consumedTokens.add(lookaheadToken)
+                                            args()
+                                            token = lexer.nextToken()
+                                            if (token != null && token.value == ")") {
+                                                consumedTokens.add(token)
+                                                token = lexer.nextToken()
+                                                if (token != null && token.value == ";") {
+                                                    consumedTokens.add(token)
+                                                }
+                                            }
+                                        } else if (lookaheadToken != null && lookaheadToken.value == "[") {
+                                            consumedTokens.add(lookaheadToken)
+                                            token = lexer.nextToken()
+                                            if (token != null && (token.type.type == ClassType.ID || token.value == "true" ||
+                                                        token.value == "false" || token.type.type == ClassType.NUMBER ||
+                                                        token.type.type == ClassType.STRING)
+                                            ) {
+                                                consumedTokens.add(token)
+                                                token = lexer.nextToken()
+                                                if (token != null && token.value == "]") { // Array type
+                                                    consumedTokens.add(token)
+                                                    token = lexer.nextToken()
+                                                    if (token != null && token.value == "[") { // Matrix type
+                                                        consumedTokens.add(token)
+                                                        token = lexer.nextToken()
+                                                        if (token != null && (token.type.type == ClassType.ID || token.value == "true" ||
+                                                                    token.value == "false" || token.type.type == ClassType.NUMBER ||
+                                                                    token.type.type == ClassType.STRING)
+                                                        ) {
+                                                            consumedTokens.add(token)
+                                                            token = lexer.nextToken()
+                                                            if (token != null && token.value == "]") {
+                                                                consumedTokens.add(token)
+                                                                token = lexer.nextToken()
+                                                                if (token != null && token.value == ";") {
+                                                                    consumedTokens.add(token)
+                                                                }
+                                                            }
+                                                        }
+                                                    } else if (token != null && token.value == ";") {
+                                                        consumedTokens.add(token)
+                                                    }
+                                                }
+                                            }
+                                        } else if (lookaheadToken != null && lookaheadToken.value == ".") {
+                                            consumedTokens.add(lookaheadToken)
+                                            token = lexer.nextToken()
+                                            if(token != null && token.type.type == ClassType.ID) {
+                                                consumedTokens.add(token)
+                                                token = lexer.nextToken()
+                                                if(token != null && token.value == ";") {
+                                                    consumedTokens.add(token)
+                                                    token = lexer.nextToken()
+                                                }
+                                            }
+                                        } else if(lookaheadToken != null && lookaheadToken.value == ";") {
+                                            consumedTokens.add(lookaheadToken)
+                                            token = lexer.nextToken()
+                                        }
+                                    } else if(token != null && (token.value == "true" || token.value == "false" ||
+                                                token.type.type == ClassType.NUMBER || token.type.type == ClassType.STRING)) {
+                                        consumedTokens.add(token)
+                                        token = lexer.nextToken()
+                                        if (token != null && token.value == ";") {
+                                            consumedTokens.add(token)
+                                            token = lexer.nextToken()
+                                        }
+                                    }
+                                }
+                            }
+                        } else if(lookaheadToken != null && lookaheadToken.value == ";") {
+                            consumedTokens.add(token)
+                            consumedTokens.add(lookaheadToken)
+                            token = lexer.nextToken()
+                        }
+                    }
                 }
                 // Calls all the other things
                 else {
@@ -144,7 +253,52 @@ class Parser {
     }
 
     private fun typedConst() {
-        //TODO("Not yet implemented")
+        var token = lexer.nextToken()
+        if(token != null && type.contains(token.value)) {
+            consumedTokens.add(token)
+            constants()
+            token = lexer.nextToken()
+            if(token != null && token.value == ";") {
+                consumedTokens.add(token)
+                token = lexer.nextToken()
+                if(token != null && type.contains(token.value)) { // Has other variable types
+                    lexer.returnToken(token)
+                    typedConst()
+                } else if(token != null && token.value == "}") { // Var block has ended
+                    consumedTokens.add(token)
+                    return
+                }
+            }
+        }
+    }
+
+    private fun constants() {
+        constDeclarator()
+        var token = lexer.nextToken()
+        if(token != null && token.value == ",") {
+            consumedTokens.add(token)
+            constants()
+        } else if(token != null) {
+            lexer.returnToken(token)
+        }
+        return
+    }
+
+    private fun constDeclarator() {
+        var token = lexer.nextToken()
+        if(token != null && token.type.type == ClassType.ID) {
+            consumedTokens.add(token)
+            token = lexer.nextToken()
+            if(token != null && token.value == "=") {
+                consumedTokens.add(token)
+                token = lexer.nextToken()
+                if(token != null && (token.value == "true" || token.value == "false" ||
+                            token.type.type == ClassType.NUMBER || token.type.type == ClassType.STRING)) {
+                    consumedTokens.add(token)
+                    return
+                }
+            }
+        }
     }
 
     private fun typedVariable() {
@@ -200,7 +354,7 @@ class Parser {
                                                 token.value == "false" || token.type.type == ClassType.NUMBER ||
                                                 token.type.type == ClassType.STRING)) {
                                         token = lexer.nextToken()
-                                        if(token != null && token.value == "]") { // Array type
+                                        if(token != null && token.value == "]") {
                                             token = lexer.nextToken()
                                             if(token != null && token.value == "=") {
                                                 token = lexer.nextToken()
@@ -252,15 +406,15 @@ class Parser {
                         } else if(token != null && token.type.type == ClassType.ID) {
                             consumedTokens.add(token)
                             var lookaheadtoken = lexer.nextToken()
-                            if(lookaheadtoken != null && token.value == ".") { // Struct Usage
-                                consumedTokens.add(token)
+                            if(lookaheadtoken != null && lookaheadtoken.value == ".") { // Struct Usage
+                                consumedTokens.add(lookaheadtoken)
                                 token = lexer.nextToken()
                                 if(token != null && token.type.type == ClassType.ID) {
                                     consumedTokens.add(token)
                                 }
-                            } else if(lookaheadtoken != null && token.value == "(") { // Call function
-                                consumedTokens.add(token)
-                                //Args()
+                            } else if(lookaheadtoken != null && lookaheadtoken.value == "(") { // Call function
+                                consumedTokens.add(lookaheadtoken)
+                                args()
                                 token = lexer.nextToken()
                                 if(token != null && token.value == ")") {
                                     consumedTokens.add(token)
@@ -287,6 +441,44 @@ class Parser {
 
     private fun varArgs() {
         //TODO("Not yet implemented")
+    }
+
+    private fun args() {
+        var token = lexer.nextToken()
+        if(token != null && token.value == ")") {
+            lexer.returnToken(token)
+        } else if(token != null) {
+            lexer.returnToken(token)
+            arg()
+            token = lexer.nextToken()
+            if(token != null && token.value == ",") {
+                consumedTokens.add(token)
+                args()
+            } else if(token != null) {
+                lexer.returnToken(token)
+            }
+        }
+    }
+
+    private fun arg() {
+        var token = lexer.nextToken()
+        if(token != null && token.type.type == ClassType.ID) {
+            consumedTokens.add(token)
+            var lookaheadToken = lexer.nextToken()
+            if(lookaheadToken != null && lookaheadToken.value == "(") { // Function
+                consumedTokens.add(lookaheadToken)
+                args()
+                token = lexer.nextToken()
+                if(token != null && token.value == ")") {
+                    consumedTokens.add(token)
+                }
+            } else if(lookaheadToken != null) { // Simple identifier
+                lexer.returnToken(lookaheadToken)
+            }
+        } else if(token != null && (token.value == "true" || token.value == "false" ||
+                    token.type.type == ClassType.NUMBER || token.type.type == ClassType.STRING)) {
+            consumedTokens.add(token)
+        }
     }
 
     private fun expression() {

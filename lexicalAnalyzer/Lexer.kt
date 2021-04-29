@@ -161,10 +161,13 @@ class Lexer(private val fileName: String) : Parser.LexicalAnalyzerProvider{
 
                 } while(isLexemeValid)
 
+
                 val actualCharLookahead = actualNextCharLookahead()
-                if(token != null && token.type.type == "DEL" && actualCharLookahead != null && actualCharLookahead.isDigit()) {
+                if(token != null && token.value == "." && actualCharLookahead != null && actualCharLookahead.isDigit()) {
                     token = null
                 }
+
+
 
                 if(token != null && !isLineComment) { // Valid token
                     token.line = line + 1
