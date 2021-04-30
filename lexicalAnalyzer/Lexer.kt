@@ -314,4 +314,6 @@ class Lexer(private val fileName: String) : Parser.LexicalAnalyzerProvider{
     override fun returnToken(token: Token) {
         tokenList.add(0, token)
     }
+
+    fun tokenList(): MutableList<Token> = tokenList
 }

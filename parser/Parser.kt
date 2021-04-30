@@ -1,6 +1,9 @@
 package parser
 
 import lexicalAnalyzer.Lexer
+import parser.exceptions.ParserException
+import parser.produtions.Init
+import parser.utils.Utils.Companion.readTokens
 import utils.ClassType
 import utils.Token
 
@@ -11,17 +14,34 @@ class Parser {
         fun returnToken(token: Token)
     }
 
-    private val tokenBuffer = mutableListOf<Token>()
+    private var tokenBuffer = mutableListOf<Token>()
     val consumedTokens = mutableListOf<Token>()
     private lateinit var lexer: Lexer
     private val type = listOf("boolean", "int", "real", "string")
 
     fun main() {
         lexer = Lexer("./input/entrada10.txt")
+        tokenBuffer = lexer.tokenList()
+
+        try {
+            Init.init(tokenBuffer)
+
+        } catch (e: ParserException) {
+
+        } catch (e: StackOverflowError) {
+            println("StackOverflowError")
+        }
+
+        tokenBuffer.readTokens().forEach {
+            println("Value: ${it.value} - line: ${it.line}")
+        }
+
+        /*
         init()
         consumedTokens.forEach {
             println("Value: ${it.value} - line: ${it.line}")
         }
+         */
     }
 
     private fun init() {
