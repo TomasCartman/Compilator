@@ -1,5 +1,6 @@
 package utils
 
+import org.omg.CORBA.UNKNOWN
 
 
 // Error tokens
@@ -8,7 +9,7 @@ const val BFSTR = "CMF"
 const val BFNUM = "NMF"
 const val BFCOM = "CoMF"
 const val BFOPE = "OpMF"
-const val UNKNOWN = "Unknown"
+
 
 class ClassType private constructor(type: String) {
     var type: String = type
@@ -24,6 +25,7 @@ class ClassType private constructor(type: String) {
         const val COMMENT = "comment"
         const val STRING = "CAD"
         const val DELIM = "DEL"
+        const val UNKNOWN = "Unknown"
 
 
         fun createRelOpType(): ClassType {

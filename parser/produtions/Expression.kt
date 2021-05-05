@@ -26,10 +26,10 @@ import parser.produtions.ArithmeticOperator.Companion.isNextTokenTimesSymbol
 import parser.produtions.ArithmeticOperator.Companion.minus
 import parser.produtions.ArithmeticOperator.Companion.plus
 import parser.produtions.ArithmeticOperator.Companion.times
-import parser.produtions.Delimeters.Companion.closingParenthesis
+import parser.produtions.Delimiters.Companion.closingParenthesis
 import parser.produtions.LogicalOperators.Companion.isNextTokenLogicalNotSymbol
-import parser.produtions.Delimeters.Companion.isNextTokenOpeningParenthesis
-import parser.produtions.Delimeters.Companion.openingParenthesis
+import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
+import parser.produtions.Delimiters.Companion.openingParenthesis
 import parser.produtions.VarDeclaration.Companion.isTokenPrimary
 import parser.produtions.VarDeclaration.Companion.primaryStringListName
 import parser.utils.Utils.Companion.nextToken

@@ -1,12 +1,12 @@
 package parser.produtions
 
 import parser.exceptions.NextTokenNullException
-import parser.produtions.Delimeters.Companion.closingParenthesis
-import parser.produtions.Delimeters.Companion.comma
-import parser.produtions.Delimeters.Companion.isNextTokenClosingParenthesis
-import parser.produtions.Delimeters.Companion.isNextTokenComma
-import parser.produtions.Delimeters.Companion.isNextTokenOpeningParenthesis
-import parser.produtions.Delimeters.Companion.openingParenthesis
+import parser.produtions.Delimiters.Companion.closingParenthesis
+import parser.produtions.Delimiters.Companion.comma
+import parser.produtions.Delimiters.Companion.isNextTokenClosingParenthesis
+import parser.produtions.Delimiters.Companion.isNextTokenComma
+import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
+import parser.produtions.Delimiters.Companion.openingParenthesis
 import parser.produtions.VarDeclaration.Companion.identifier
 import parser.produtions.VarDeclaration.Companion.isTokenIdentifier
 import parser.produtions.VarDeclaration.Companion.isTokenPrimary

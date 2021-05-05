@@ -7,12 +7,14 @@ import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.peekNextToken
 import utils.Token
 
-class Delimeters {
+class Delimiters {
     companion object {
         fun openingCurlyBracket(tokenBuffer: MutableList<Token>) {
             try {
                 if(isNextTokenOpeningCurlyBracket(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throwDelimitersError("{", tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
                 throwDelimitersError("{", tokenBuffer)
@@ -23,6 +25,8 @@ class Delimeters {
             try {
                 if(isNextTokenClosingCurlyBracket(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throwDelimitersError("}", tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
                 throwDelimitersError("}", tokenBuffer)
@@ -33,6 +37,8 @@ class Delimeters {
             try {
                 if(isNextTokenSemicolon(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throwDelimitersError(";", tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
                 throwDelimitersError(";", tokenBuffer)
@@ -43,6 +49,8 @@ class Delimeters {
             try {
                 if(isNextTokenComma(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throwDelimitersError(",", tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
                 throwDelimitersError(",", tokenBuffer)
@@ -53,6 +61,8 @@ class Delimeters {
             try {
                 if(isNextTokenDot(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throwDelimitersError(".", tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
                 throwDelimitersError(".", tokenBuffer)
@@ -63,6 +73,8 @@ class Delimeters {
             try {
                 if(isNextTokenOpeningParenthesis(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throwDelimitersError("(", tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
                 throwDelimitersError("(", tokenBuffer)
@@ -73,6 +85,8 @@ class Delimeters {
             try {
                 if(isNextTokenClosingParenthesis(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throwDelimitersError(")", tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
                 throwDelimitersError(")", tokenBuffer)
@@ -83,6 +97,8 @@ class Delimeters {
             try {
                 if(isNextTokenOpeningSquareBracket(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throwDelimitersError("[", tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
                 throwDelimitersError("[", tokenBuffer)
@@ -93,6 +109,8 @@ class Delimeters {
             try {
                 if(isNextTokenClosingSquareBracket(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throwDelimitersError("]", tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
                 throwDelimitersError("]", tokenBuffer)
@@ -120,7 +138,7 @@ class Delimeters {
         private fun throwDelimitersError(expectedSymbol: String, tokenBuffer: MutableList<Token>) {
             val lastValidToken = tokenBuffer.lastValidToken()
             if(lastValidToken != null) {
-                throw ParserException(lastValidToken.line, null, listOf(expectedSymbol))
+                throw ParserException(lastValidToken.line, lastValidToken, listOf(expectedSymbol))
             } else {
                 throw ParserException(0, null, listOf(expectedSymbol))
             }

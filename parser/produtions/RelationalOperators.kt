@@ -1,6 +1,7 @@
 package parser.produtions
 
 import parser.exceptions.NextTokenNullException
+import parser.exceptions.ParserException
 import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.peekNextToken
 import utils.Token
@@ -12,6 +13,8 @@ class RelationalOperators {
             try {
                 if (isNextTokenAssignmentSymbol(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(), listOf("="))
                 }
             } catch (e: NextTokenNullException) {
 

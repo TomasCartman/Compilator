@@ -1,8 +1,8 @@
 package parser.produtions
 
 import parser.exceptions.NextTokenNullException
-import parser.produtions.Delimeters.Companion.dot
-import parser.produtions.Delimeters.Companion.isNextTokenDot
+import parser.produtions.Delimiters.Companion.dot
+import parser.produtions.Delimiters.Companion.isNextTokenDot
 import parser.produtions.VarDeclaration.Companion.identifier
 import parser.produtions.VarDeclaration.Companion.isTokenIdentifier
 import parser.utils.Utils.Companion.peekNextToken

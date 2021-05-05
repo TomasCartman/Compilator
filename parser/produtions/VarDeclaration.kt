@@ -3,18 +3,18 @@ package parser.produtions
 import parser.exceptions.NextTokenNullException
 import parser.exceptions.ParserException
 import parser.produtions.Array.Companion.arrayUsage
-import parser.produtions.Delimeters.Companion.closingCurlyBracket
-import parser.produtions.Delimeters.Companion.comma
-import parser.produtions.Delimeters.Companion.dot
-import parser.produtions.Delimeters.Companion.isNextTokenClosingCurlyBracket
-import parser.produtions.Delimeters.Companion.isNextTokenComma
-import parser.produtions.Delimeters.Companion.isNextTokenDot
-import parser.produtions.Delimeters.Companion.isNextTokenOpeningParenthesis
-import parser.produtions.Delimeters.Companion.isNextTokenOpeningSquareBracket
-import parser.produtions.Delimeters.Companion.isNextTokenSemicolon
+import parser.produtions.Delimiters.Companion.closingCurlyBracket
+import parser.produtions.Delimiters.Companion.comma
+import parser.produtions.Delimiters.Companion.dot
+import parser.produtions.Delimiters.Companion.isNextTokenClosingCurlyBracket
+import parser.produtions.Delimiters.Companion.isNextTokenComma
+import parser.produtions.Delimiters.Companion.isNextTokenDot
+import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
+import parser.produtions.Delimiters.Companion.isNextTokenOpeningSquareBracket
+import parser.produtions.Delimiters.Companion.isNextTokenSemicolon
 import parser.utils.Utils.Companion.nextToken
-import parser.produtions.Delimeters.Companion.openingCurlyBracket
-import parser.produtions.Delimeters.Companion.semicolon
+import parser.produtions.Delimiters.Companion.openingCurlyBracket
+import parser.produtions.Delimiters.Companion.semicolon
 import parser.produtions.Expression.Companion.expression
 import parser.produtions.Function.Companion.callFunction
 import parser.produtions.RelationalOperators.Companion.assignment
@@ -35,14 +35,20 @@ class VarDeclaration {
         fun varDeclaration(tokenBuffer: MutableList<Token>) {
             try {
                 val token = tokenBuffer.nextToken()
-                if(isVarDeclaration(token)) { // Var
-                    openingCurlyBracket(tokenBuffer)
-                    typedVariable(tokenBuffer)
-                    closingCurlyBracket(tokenBuffer)
-                } else { // Const
-                    openingCurlyBracket(tokenBuffer)
-                    typedConst(tokenBuffer)
-                    closingCurlyBracket(tokenBuffer)
+                when {
+                    isVarDeclaration(token) -> { // Var
+                        openingCurlyBracket(tokenBuffer)
+                        typedVariable(tokenBuffer)
+                        closingCurlyBracket(tokenBuffer)
+                    }
+                    isConstDeclaration(token) -> { // Const
+                        openingCurlyBracket(tokenBuffer)
+                        typedConst(tokenBuffer)
+                        closingCurlyBracket(tokenBuffer)
+                    }
+                    else -> {
+                        throw ParserException(token.line, token, listOf("var", "const"))
+                    }
                 }
             } catch (e: NextTokenNullException) {
 
@@ -92,7 +98,7 @@ class VarDeclaration {
                     identifier(tokenBuffer)
                     assignment(tokenBuffer)
                     if(isTokenLiteral(tokenBuffer.peekNextToken())) {
-                        tokenBuffer.nextToken() // Consume Literal
+                        literal(tokenBuffer)
                     }
                 }
             } catch (e: NextTokenNullException) {
@@ -135,13 +141,13 @@ class VarDeclaration {
                         assignment(tokenBuffer)
                         val tokenPeekNext = tokenBuffer.peekNextToken()
                         if(variableScopeType.contains(tokenPeekNext.value)) { // VariableScopeType
-                            tokenBuffer.nextToken() // Consume variable scope
+                            variableScopeType(tokenBuffer)
                             dot(tokenBuffer)
-                            val tokenNext = tokenBuffer.nextToken()
-                            if (isTokenIdentifier(tokenNext)) {
+                            val tokenPeekNext = tokenBuffer.peekNextToken()
+                            if (isTokenIdentifier(tokenPeekNext)) {
                                 identifier(tokenBuffer)
                             } else {
-                                throw ParserException(tokenNext.line, tokenNext, listOf("Identifier"))
+                                throw ParserException(tokenPeekNext.line, tokenPeekNext, listOf("Identifier"))
                             }
                         } else if(isTokenIdentifier(tokenPeekNext)) {
                             identifier(tokenBuffer)
@@ -155,6 +161,9 @@ class VarDeclaration {
                             }
                         } else if(isTokenPrimary(tokenPeekNext)) {
                             expression(tokenBuffer)
+                        } else {
+                            throw ParserException(tokenPeekNext.line, tokenPeekNext, listOf("local", "global",
+                                "Identifier", "true", "false", "real", "int", "string"))
                         }
                     } else if(isNextTokenOpeningSquareBracket(tokenPeek)) { // Array Usage
                         tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
@@ -290,6 +299,8 @@ class VarDeclaration {
             try {
                 if(isTokenIdentifier(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(), listOf("Identifier"))
                 }
             } catch (e: NextTokenNullException) {
 
@@ -313,6 +324,9 @@ class VarDeclaration {
             try {
                 if (isTokenLiteral(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(),
+                        listOf("true", "false", "real", "int", "string"))
                 }
             } catch (e: NextTokenNullException) {
 
@@ -329,7 +343,87 @@ class VarDeclaration {
             }
         }
 
+        fun variableScope(tokenBuffer: MutableList<Token>) {
+            try {
+                val tokenPeek = tokenBuffer.peekNextToken()
+                if (isTokenVariableScopeType(tokenPeek)) {
+                    variableScopeType(tokenBuffer)
+                    dot(tokenBuffer)
+                    identifier(tokenBuffer)
+                    val tokenPeekNext = tokenBuffer.peekNextToken()
+                    if (isNextTokenAssignmentSymbol(tokenPeekNext)) {
+                        assignment(tokenBuffer)
+                        if (isTokenVariableScopeType(tokenBuffer.peekNextToken())) {
+                            variableScopeType(tokenBuffer)
+                            dot(tokenBuffer)
+                            identifier(tokenBuffer)
+                            if (isNextTokenOpeningSquareBracket(tokenBuffer.peekNextToken())) {
+                                tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                                arrayUsage(tokenBuffer)
+                                semicolon(tokenBuffer)
+                            } else {
+                                semicolon(tokenBuffer)
+                            }
+                        } else if (isTokenIdentifier(tokenBuffer.peekNextToken())) {
+                            identifier(tokenBuffer)
+                            when {
+                                isNextTokenOpeningSquareBracket(tokenBuffer.peekNextToken()) -> {
+                                    tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                                    arrayUsage(tokenBuffer)
+                                    semicolon(tokenBuffer)
+                                }
+                                isNextTokenDot(tokenBuffer.peekNextToken()) -> {
+                                    tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                                    structUsage(tokenBuffer)
+                                    semicolon(tokenBuffer)
+                                }
+                                else -> semicolon(tokenBuffer)
+                            }
+                        } else if (isTokenLiteral(tokenBuffer.peekNextToken())) {
+                            literal(tokenBuffer)
+                            semicolon(tokenBuffer)
+                        }
+                    } else if (isNextTokenOpeningSquareBracket(tokenPeekNext)) {
+                        tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                        arrayUsage(tokenBuffer)
+                        assignment(tokenBuffer)
+                        variableScopeType(tokenBuffer)
+                        dot(tokenBuffer)
+                        identifier(tokenBuffer)
+                        semicolon(tokenBuffer)
+                    } else {
+                        tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                        variableUsage(tokenBuffer)
+                    }
+                } else if (isTokenIdentifier(tokenPeek)) {
+                    identifier(tokenBuffer)
+                    val tokenPeekNext = tokenBuffer.peekNextToken()
+                    if (isNextTokenOpeningSquareBracket(tokenPeekNext)) {
+                        tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                        arrayUsage(tokenBuffer)
+                        assignment(tokenBuffer)
+                        variableScopeType(tokenBuffer)
+                        dot(tokenBuffer)
+                        identifier(tokenBuffer)
+                        semicolon(tokenBuffer)
+                    } else if (isNextTokenDot(tokenPeekNext)) {
+                        tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                        structUsage(tokenBuffer)
+                        assignment(tokenBuffer)
+                        variableScopeType(tokenBuffer)
+                        dot(tokenBuffer)
+                        identifier(tokenBuffer)
+                        semicolon(tokenBuffer)
+                    }
+                }
+            } catch (e: NextTokenNullException) {
+
+            }
+        }
+
         private fun isVarDeclaration(token: Token): Boolean = token.value == "var"
+
+        private fun isConstDeclaration(token: Token): Boolean = token.value == "const"
 
         fun isTokenIdentifier(token: Token): Boolean = token.type.type == ClassType.ID
 

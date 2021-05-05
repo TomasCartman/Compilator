@@ -2,11 +2,13 @@ package parser.utils
 
 import parser.exceptions.NextTokenNullException
 import parser.exceptions.ParserException
+import utils.ClassType
 import utils.Token
 
 class Utils {
     companion object {
         var readTokens = mutableListOf<Token>()
+        var errorTokens = mutableListOf<Token>()
 
         fun MutableList<Token>.hasNextToken(): Boolean = this.isNotEmpty()
 
@@ -45,5 +47,14 @@ class Utils {
             }
             throw NextTokenNullException()
         }
+
+        fun MutableList<Token>.addParserException(e: ParserException) {
+            val receivedTokenLine = e.receivedToken?.line ?: 0
+            val receivedTokenValue = e.receivedToken?.value ?: ""
+            val token = Token(ClassType.createUnknownErrorType(), receivedTokenValue, receivedTokenLine, e.expectedTokens)
+            errorTokens.add(token)
+        }
+
+        fun MutableList<Token>.getErrors(): List<Token> = errorTokens
     }
 }

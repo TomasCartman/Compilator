@@ -1,15 +1,20 @@
 package parser.produtions
 
 import parser.exceptions.NextTokenNullException
-import parser.produtions.Delimeters.Companion.closingCurlyBracket
+import parser.exceptions.ParserException
+import parser.produtions.Delimiters.Companion.closingCurlyBracket
 import parser.utils.Utils.Companion.peekNextToken
-import parser.produtions.Delimeters.Companion.isNextTokenOpeningCurlyBracket
-import parser.produtions.Delimeters.Companion.isNextTokenOpeningParenthesis
-import parser.produtions.Delimeters.Companion.openingCurlyBracket
+import parser.produtions.Delimiters.Companion.isNextTokenOpeningCurlyBracket
+import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
+import parser.produtions.Delimiters.Companion.openingCurlyBracket
 import parser.produtions.VarDeclaration.Companion.identifier
 import parser.produtions.VarDeclaration.Companion.isTokenIdentifier
+import parser.produtions.VarDeclaration.Companion.isTokenVariableScopeType
 import parser.produtions.VarDeclaration.Companion.varDeclaration
+import parser.produtions.VarDeclaration.Companion.variableScope
 import parser.produtions.VarDeclaration.Companion.variableUsage
+import parser.utils.Utils.Companion.addParserException
+import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.removeLastReadTokenAndPutBackInTokenList
 import utils.Token
 
@@ -40,6 +45,8 @@ class Statement {
                     varDeclaration(tokenBuffer)
                 } else if (isFunctionDeclaration(tokenPeekInsideBrackets)) {
 
+                } else if(isTokenVariableScopeType(tokenPeekInsideBrackets)) {
+                  variableScope(tokenBuffer)
                 } else if (isTokenIdentifier(tokenPeekInsideBrackets)) {
                     identifier(tokenBuffer)
                     if (isNextTokenOpeningParenthesis(tokenBuffer.peekNextToken())) { // Function call
@@ -51,6 +58,9 @@ class Statement {
                 }
             } catch (e: NextTokenNullException) {
 
+            } catch (e: ParserException) {
+                tokenBuffer.addParserException(e)
+                statement(tokenBuffer)
             }
         }
 
