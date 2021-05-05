@@ -71,11 +71,31 @@ class Delimeters {
 
         fun closingParenthesis(tokenBuffer: MutableList<Token>) {
             try {
-                if(isNextTokenOpeningParenthesis(tokenBuffer.peekNextToken())) {
+                if(isNextTokenClosingParenthesis(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
                 }
             } catch (e: NextTokenNullException) {
                 throwDelimitersError(")", tokenBuffer)
+            }
+        }
+
+        fun openingSquareBracket(tokenBuffer: MutableList<Token>) {
+            try {
+                if(isNextTokenOpeningSquareBracket(tokenBuffer.peekNextToken())) {
+                    tokenBuffer.nextToken()
+                }
+            } catch (e: NextTokenNullException) {
+                throwDelimitersError("[", tokenBuffer)
+            }
+        }
+
+        fun closingSquareBracket(tokenBuffer: MutableList<Token>) {
+            try {
+                if(isNextTokenClosingSquareBracket(tokenBuffer.peekNextToken())) {
+                    tokenBuffer.nextToken()
+                }
+            } catch (e: NextTokenNullException) {
+                throwDelimitersError("]", tokenBuffer)
             }
         }
 
@@ -88,6 +108,8 @@ class Delimeters {
         fun isNextTokenComma(token: Token): Boolean = token.value == ","
 
         fun isNextTokenOpeningSquareBracket(token: Token): Boolean = token.value == "["
+
+        fun isNextTokenClosingSquareBracket(token: Token): Boolean = token.value == "]"
 
         fun isNextTokenDot(token: Token): Boolean = token.value == "."
 

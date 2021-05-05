@@ -4,8 +4,13 @@ import parser.exceptions.NextTokenNullException
 import parser.produtions.Delimeters.Companion.closingCurlyBracket
 import parser.utils.Utils.Companion.peekNextToken
 import parser.produtions.Delimeters.Companion.isNextTokenOpeningCurlyBracket
+import parser.produtions.Delimeters.Companion.isNextTokenOpeningParenthesis
 import parser.produtions.Delimeters.Companion.openingCurlyBracket
+import parser.produtions.VarDeclaration.Companion.identifier
+import parser.produtions.VarDeclaration.Companion.isTokenIdentifier
 import parser.produtions.VarDeclaration.Companion.varDeclaration
+import parser.produtions.VarDeclaration.Companion.variableUsage
+import parser.utils.Utils.Companion.removeLastReadTokenAndPutBackInTokenList
 import utils.Token
 
 class Statement {
@@ -31,10 +36,18 @@ class Statement {
         private fun simpleStatement(tokenBuffer: MutableList<Token>) {
             try {
                 val tokenPeekInsideBrackets = tokenBuffer.peekNextToken()
-                if(isVarDeclaration(tokenPeekInsideBrackets)) {
+                if (isVarDeclaration(tokenPeekInsideBrackets)) {
                     varDeclaration(tokenBuffer)
-                } else if(isFunctionDeclaration(tokenPeekInsideBrackets)) {
+                } else if (isFunctionDeclaration(tokenPeekInsideBrackets)) {
 
+                } else if (isTokenIdentifier(tokenPeekInsideBrackets)) {
+                    identifier(tokenBuffer)
+                    if (isNextTokenOpeningParenthesis(tokenBuffer.peekNextToken())) { // Function call
+                        tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                    } else { // Variable usage
+                        tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                        variableUsage(tokenBuffer)
+                    }
                 }
             } catch (e: NextTokenNullException) {
 
