@@ -31,7 +31,7 @@ class VarDeclaration {
         private val booleanList = listOf("true", "false")
         private val variableScopeType = listOf("local", "global")
         val varDeclarationTerminals = listOf("var", "const")
-        val primaryStringListName = listOf("Identifier", "true", "false", "Real", "Decimal", "String")
+        val primaryStringListName = listOf("Identifier", "true", "false", "real", "int", "string")
 
         fun varDeclaration(tokenBuffer: MutableList<Token>) {
             try {
@@ -321,7 +321,7 @@ class VarDeclaration {
             }
         }
 
-        private fun literal(tokenBuffer: MutableList<Token>) {
+        fun literal(tokenBuffer: MutableList<Token>) {
             try {
                 if (isTokenLiteral(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()

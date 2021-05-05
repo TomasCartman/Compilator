@@ -7,6 +7,10 @@ import parser.utils.Utils.Companion.peekNextToken
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningCurlyBracket
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
 import parser.produtions.Delimiters.Companion.openingCurlyBracket
+import parser.produtions.IO.Companion.isNextTokenPrintStat
+import parser.produtions.IO.Companion.isNextTokenReadStat
+import parser.produtions.IO.Companion.printStat
+import parser.produtions.IO.Companion.readStat
 import parser.produtions.Struct.Companion.isStructDeclaration
 import parser.produtions.Struct.Companion.structDeclaration
 import parser.produtions.VarDeclaration.Companion.identifier
@@ -51,6 +55,10 @@ class Statement {
                   variableScope(tokenBuffer)
                 } else if(isStructDeclaration(tokenPeekInsideBrackets)) {
                     structDeclaration(tokenBuffer)
+                } else if(isNextTokenReadStat(tokenPeekInsideBrackets)) {
+                    readStat(tokenBuffer)
+                } else if(isNextTokenPrintStat(tokenPeekInsideBrackets)) {
+                    printStat(tokenBuffer)
                 } else if (isTokenIdentifier(tokenPeekInsideBrackets)) {
                     identifier(tokenBuffer)
                     if (isNextTokenOpeningParenthesis(tokenBuffer.peekNextToken())) { // Function call

@@ -1,0 +1,9 @@
+procedure start {
+    print("asda");
+
+    read(a);
+
+    print(22);
+    print(pessoa.a);
+    print(d[2][3]);
+}
