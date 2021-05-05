@@ -30,6 +30,7 @@ class VarDeclaration {
         private val types = listOf("boolean", "string", "int", "real")
         private val booleanList = listOf("true", "false")
         private val variableScopeType = listOf("local", "global")
+        val varDeclarationTerminals = listOf("var", "const")
         val primaryStringListName = listOf("Identifier", "true", "false", "Real", "Decimal", "String")
 
         fun varDeclaration(tokenBuffer: MutableList<Token>) {

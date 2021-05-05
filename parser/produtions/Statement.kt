@@ -7,10 +7,13 @@ import parser.utils.Utils.Companion.peekNextToken
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningCurlyBracket
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
 import parser.produtions.Delimiters.Companion.openingCurlyBracket
+import parser.produtions.Struct.Companion.isStructDeclaration
+import parser.produtions.Struct.Companion.structDeclaration
 import parser.produtions.VarDeclaration.Companion.identifier
 import parser.produtions.VarDeclaration.Companion.isTokenIdentifier
 import parser.produtions.VarDeclaration.Companion.isTokenVariableScopeType
 import parser.produtions.VarDeclaration.Companion.varDeclaration
+import parser.produtions.VarDeclaration.Companion.varDeclarationTerminals
 import parser.produtions.VarDeclaration.Companion.variableScope
 import parser.produtions.VarDeclaration.Companion.variableUsage
 import parser.utils.Utils.Companion.addParserException
@@ -20,7 +23,6 @@ import utils.Token
 
 class Statement {
     companion object {
-        private val varDeclarationTerminals = listOf("var", "const")
         private val functionDeclaration = listOf("function", "procedure")
 
         fun statement(tokenBuffer: MutableList<Token>) {
@@ -47,6 +49,8 @@ class Statement {
 
                 } else if(isTokenVariableScopeType(tokenPeekInsideBrackets)) {
                   variableScope(tokenBuffer)
+                } else if(isStructDeclaration(tokenPeekInsideBrackets)) {
+                    structDeclaration(tokenBuffer)
                 } else if (isTokenIdentifier(tokenPeekInsideBrackets)) {
                     identifier(tokenBuffer)
                     if (isNextTokenOpeningParenthesis(tokenBuffer.peekNextToken())) { // Function call

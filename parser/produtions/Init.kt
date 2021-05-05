@@ -18,9 +18,11 @@ class Init {
                 if(isTokenValueProcedure(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
                     start(tokenBuffer)
+                } else {
+                    throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(), listOf("procedure"))
                 }
             } catch (e: NextTokenNullException) {
-             throw ParserException(0, null, listOf("procedure"))
+                throw ParserException(0, null, listOf("procedure"))
             }
         }
 
@@ -31,6 +33,8 @@ class Init {
                     openingCurlyBracket(tokenBuffer)
                     program(tokenBuffer)
                     closingCurlyBracket(tokenBuffer)
+                } else {
+                    throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(), listOf("start"))
                 }
             } catch (e: NextTokenNullException) {
                 throw ParserException(0, null, listOf("start"))
