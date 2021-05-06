@@ -107,7 +107,7 @@ class VarDeclaration {
             }
         }
 
-        private fun type(tokenBuffer: MutableList<Token>) {
+        fun type(tokenBuffer: MutableList<Token>) {
             try {
                 val tokenPeek = tokenBuffer.peekNextToken()
                 if(types.contains(tokenPeek.value)) {
@@ -159,6 +159,9 @@ class VarDeclaration {
                             } else if(isNextTokenOpeningParenthesis(tokenPeekThird)) { // Call function
                                 tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
                                 callFunction(tokenBuffer)
+                            } else {
+                                tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                                expression(tokenBuffer)
                             }
                         } else if(isTokenPrimary(tokenPeekNext)) {
                             expression(tokenBuffer)

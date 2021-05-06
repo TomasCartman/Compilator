@@ -7,6 +7,11 @@ import parser.utils.Utils.Companion.peekNextToken
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningCurlyBracket
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
 import parser.produtions.Delimiters.Companion.openingCurlyBracket
+import parser.produtions.Function.Companion.callFunction
+import parser.produtions.Function.Companion.functionDeclaration
+import parser.produtions.Function.Companion.isNextTokenFunctionDeclaration
+import parser.produtions.Function.Companion.isNextTokenProcedureDeclaration
+import parser.produtions.Function.Companion.procedureDeclaration
 import parser.produtions.IO.Companion.isNextTokenPrintStat
 import parser.produtions.IO.Companion.isNextTokenReadStat
 import parser.produtions.IO.Companion.printStat
@@ -27,8 +32,6 @@ import utils.Token
 
 class Statement {
     companion object {
-        private val functionDeclaration = listOf("function", "procedure")
-
         fun statement(tokenBuffer: MutableList<Token>) {
             try {
                 val tokenPeek = tokenBuffer.peekNextToken()
@@ -44,13 +47,11 @@ class Statement {
             }
         }
 
-        private fun simpleStatement(tokenBuffer: MutableList<Token>) {
+        fun simpleStatement(tokenBuffer: MutableList<Token>) {
             try {
                 val tokenPeekInsideBrackets = tokenBuffer.peekNextToken()
                 if (isVarDeclaration(tokenPeekInsideBrackets)) {
                     varDeclaration(tokenBuffer)
-                } else if (isFunctionDeclaration(tokenPeekInsideBrackets)) {
-
                 } else if(isTokenVariableScopeType(tokenPeekInsideBrackets)) {
                   variableScope(tokenBuffer)
                 } else if(isStructDeclaration(tokenPeekInsideBrackets)) {
@@ -59,10 +60,15 @@ class Statement {
                     readStat(tokenBuffer)
                 } else if(isNextTokenPrintStat(tokenPeekInsideBrackets)) {
                     printStat(tokenBuffer)
+                } else if(isNextTokenFunctionDeclaration(tokenPeekInsideBrackets)) {
+                    functionDeclaration(tokenBuffer)
+                } else if(isNextTokenProcedureDeclaration(tokenPeekInsideBrackets)) {
+                    procedureDeclaration(tokenBuffer)
                 } else if (isTokenIdentifier(tokenPeekInsideBrackets)) {
                     identifier(tokenBuffer)
                     if (isNextTokenOpeningParenthesis(tokenBuffer.peekNextToken())) { // Function call
                         tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                        callFunction(tokenBuffer)
                     } else { // Variable usage
                         tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
                         variableUsage(tokenBuffer)
@@ -78,6 +84,6 @@ class Statement {
 
         private fun isVarDeclaration(token: Token): Boolean = varDeclarationTerminals.contains(token.value)
 
-        private fun isFunctionDeclaration(token: Token): Boolean = functionDeclaration.contains(token.value)
+        //private fun isFunctionDeclaration(token: Token): Boolean = functionDeclaration.contains(token.value)
     }
 }

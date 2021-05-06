@@ -1,0 +1,35 @@
+procedure start {
+    const {
+        real pi = 3.1415;
+    }
+
+    typedef struct {
+        var {
+            int a = 1;
+            string className = "test";
+        }
+    } test;
+
+    var {
+        int a, e = 3, d;
+        string b="hi", c;
+    }
+
+    print("Choose the value of 'a'");
+    read(a);
+
+    d = pi * a;
+    print(d);
+
+
+    function int add(int a, int b) {
+        return a + b;
+    }
+
+    procedure printSomething(string a) {
+        print(a);
+    }
+
+    a = add(1, 2);
+    printSomething("this.")
+}

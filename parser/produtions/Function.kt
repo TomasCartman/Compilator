@@ -1,15 +1,24 @@
 package parser.produtions
 
 import parser.exceptions.NextTokenNullException
+import parser.produtions.Delimiters.Companion.closingCurlyBracket
 import parser.produtions.Delimiters.Companion.closingParenthesis
 import parser.produtions.Delimiters.Companion.comma
+import parser.produtions.Delimiters.Companion.isNextTokenClosingCurlyBracket
 import parser.produtions.Delimiters.Companion.isNextTokenClosingParenthesis
 import parser.produtions.Delimiters.Companion.isNextTokenComma
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
+import parser.produtions.Delimiters.Companion.isNextTokenSemicolon
+import parser.produtions.Delimiters.Companion.openingCurlyBracket
 import parser.produtions.Delimiters.Companion.openingParenthesis
+import parser.produtions.Delimiters.Companion.semicolon
+import parser.produtions.Expression.Companion.expression
+import parser.produtions.Statement.Companion.simpleStatement
 import parser.produtions.VarDeclaration.Companion.identifier
 import parser.produtions.VarDeclaration.Companion.isTokenIdentifier
 import parser.produtions.VarDeclaration.Companion.isTokenPrimary
+import parser.produtions.VarDeclaration.Companion.type
+import parser.utils.Utils.Companion.hasNextToken
 import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.peekNextToken
 import parser.utils.Utils.Companion.removeLastReadTokenAndPutBackInTokenList
@@ -29,6 +38,114 @@ class Function {
                         }
                     }
                 }
+            } catch (e: NextTokenNullException) {
+
+            }
+        }
+
+        fun functionDeclaration(tokenBuffer: MutableList<Token>) {
+            try {
+                if (isNextTokenFunctionDeclaration(tokenBuffer.peekNextToken())) {
+                    tokenBuffer.nextToken() // Consume function
+                    type(tokenBuffer)
+                    identifier(tokenBuffer)
+                    openingParenthesis(tokenBuffer)
+                    params(tokenBuffer)
+                    closingParenthesis(tokenBuffer)
+                    blockFunction(tokenBuffer)
+                }
+            } catch (e : NextTokenNullException) {
+
+            }
+        }
+
+        private fun blockFunction(tokenBuffer: MutableList<Token>) {
+            try {
+                openingCurlyBracket(tokenBuffer)
+                simpleStatement(tokenBuffer)
+                while (tokenBuffer.hasNextToken() && !isNextTokenReturn(tokenBuffer.peekNextToken())) {
+                    simpleStatement(tokenBuffer)
+                }
+                returnMethod(tokenBuffer)
+                closingCurlyBracket(tokenBuffer)
+            } catch (e: NextTokenNullException) {
+
+            }
+        }
+
+        private fun returnMethod(tokenBuffer: MutableList<Token>) {
+            try {
+                if (isNextTokenReturn(tokenBuffer.peekNextToken())) {
+                    tokenBuffer.nextToken() // Consume return
+                    if (isTokenIdentifier(tokenBuffer.peekNextToken())) {
+                        identifier(tokenBuffer)
+                        if (isNextTokenOpeningParenthesis(tokenBuffer.peekNextToken())) {
+                            tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                            callFunction(tokenBuffer)
+                            semicolon(tokenBuffer)
+                        } else {
+                            tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                            expression(tokenBuffer)
+                            semicolon(tokenBuffer)
+                        }
+                    } else if(isNextTokenSemicolon(tokenBuffer.peekNextToken())) {
+                        semicolon(tokenBuffer)
+                    } else {
+                        expression(tokenBuffer)
+                        semicolon(tokenBuffer)
+                    }
+                }
+            } catch (e: NextTokenNullException) {
+
+            }
+        }
+
+        fun procedureDeclaration(tokenBuffer: MutableList<Token>) {
+            try {
+                if (isNextTokenProcedureDeclaration(tokenBuffer.peekNextToken())) {
+                    tokenBuffer.nextToken() // Consume procedure
+                    identifier(tokenBuffer)
+                    openingParenthesis(tokenBuffer)
+                    params(tokenBuffer)
+                    closingParenthesis(tokenBuffer)
+                    blockProcedure(tokenBuffer)
+                }
+            } catch (e : NextTokenNullException) {
+
+            }
+        }
+
+        private fun blockProcedure(tokenBuffer: MutableList<Token>) {
+            try {
+                openingCurlyBracket(tokenBuffer)
+                simpleStatement(tokenBuffer)
+                while (tokenBuffer.hasNextToken() && !isNextTokenClosingCurlyBracket(tokenBuffer.peekNextToken())) {
+                    simpleStatement(tokenBuffer)
+                }
+                closingCurlyBracket(tokenBuffer)
+            } catch (e: NextTokenNullException) {
+
+            }
+        }
+
+        private fun params(tokenBuffer: MutableList<Token>) {
+            try {
+                if (!isNextTokenClosingParenthesis(tokenBuffer.peekNextToken())) {
+                    param(tokenBuffer)
+                    if (isNextTokenComma(tokenBuffer.peekNextToken())) {
+                        comma(tokenBuffer)
+                        params(tokenBuffer)
+                    }
+                }
+            } catch (e: NextTokenNullException) {
+
+            }
+        }
+
+        private fun param(tokenBuffer: MutableList<Token>) {
+            try {
+                type(tokenBuffer)
+                identifier(tokenBuffer)
             } catch (e: NextTokenNullException) {
 
             }
@@ -64,5 +181,11 @@ class Function {
 
             }
         }
+
+        fun isNextTokenFunctionDeclaration(token: Token): Boolean = token.value == "function"
+
+        fun isNextTokenProcedureDeclaration(token: Token): Boolean = token.value == "procedure"
+
+        fun isNextTokenReturn(token: Token): Boolean = token.value == "return"
     }
 }

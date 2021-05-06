@@ -20,7 +20,7 @@ class Parser {
     private val type = listOf("boolean", "int", "real", "string")
 
     fun main() {
-        lexer = Lexer("./input/entrada12.txt")
+        lexer = Lexer("./input/entrada13.txt")
         tokenBuffer = lexer.tokenList()
 
         try {
