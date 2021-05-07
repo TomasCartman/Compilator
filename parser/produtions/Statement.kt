@@ -7,6 +7,7 @@ import parser.utils.Utils.Companion.peekNextToken
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningCurlyBracket
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
 import parser.produtions.Delimiters.Companion.openingCurlyBracket
+import parser.produtions.Delimiters.Companion.semicolon
 import parser.produtions.Function.Companion.callFunction
 import parser.produtions.Function.Companion.functionDeclaration
 import parser.produtions.Function.Companion.isNextTokenFunctionDeclaration
@@ -16,6 +17,8 @@ import parser.produtions.IO.Companion.isNextTokenPrintStat
 import parser.produtions.IO.Companion.isNextTokenReadStat
 import parser.produtions.IO.Companion.printStat
 import parser.produtions.IO.Companion.readStat
+import parser.produtions.If.Companion.ifStatement
+import parser.produtions.If.Companion.isNextTokenIf
 import parser.produtions.Struct.Companion.isStructDeclaration
 import parser.produtions.Struct.Companion.structDeclaration
 import parser.produtions.VarDeclaration.Companion.identifier
@@ -25,6 +28,8 @@ import parser.produtions.VarDeclaration.Companion.varDeclaration
 import parser.produtions.VarDeclaration.Companion.varDeclarationTerminals
 import parser.produtions.VarDeclaration.Companion.variableScope
 import parser.produtions.VarDeclaration.Companion.variableUsage
+import parser.produtions.While.Companion.isNextTokenWhile
+import parser.produtions.While.Companion.whileStatement
 import parser.utils.Utils.Companion.addParserException
 import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.removeLastReadTokenAndPutBackInTokenList
@@ -64,11 +69,16 @@ class Statement {
                     functionDeclaration(tokenBuffer)
                 } else if(isNextTokenProcedureDeclaration(tokenPeekInsideBrackets)) {
                     procedureDeclaration(tokenBuffer)
+                } else if(isNextTokenWhile(tokenPeekInsideBrackets)) {
+                    whileStatement(tokenBuffer)
+                } else if(isNextTokenIf(tokenPeekInsideBrackets)) {
+                    ifStatement(tokenBuffer)
                 } else if (isTokenIdentifier(tokenPeekInsideBrackets)) {
                     identifier(tokenBuffer)
                     if (isNextTokenOpeningParenthesis(tokenBuffer.peekNextToken())) { // Function call
                         tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
                         callFunction(tokenBuffer)
+                        semicolon(tokenBuffer)
                     } else { // Variable usage
                         tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
                         variableUsage(tokenBuffer)
@@ -83,7 +93,5 @@ class Statement {
         }
 
         private fun isVarDeclaration(token: Token): Boolean = varDeclarationTerminals.contains(token.value)
-
-        //private fun isFunctionDeclaration(token: Token): Boolean = functionDeclaration.contains(token.value)
     }
 }

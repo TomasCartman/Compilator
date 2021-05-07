@@ -30,13 +30,9 @@ class Function {
             try {
                 if (isTokenIdentifier(tokenBuffer.peekNextToken())) {
                     identifier(tokenBuffer)
-                    if (isNextTokenOpeningParenthesis(tokenBuffer.peekNextToken())) {
-                        openingParenthesis(tokenBuffer)
-                        args(tokenBuffer)
-                        if (isNextTokenClosingParenthesis(tokenBuffer.peekNextToken())) {
-                            closingParenthesis(tokenBuffer)
-                        }
-                    }
+                    openingParenthesis(tokenBuffer)
+                    args(tokenBuffer)
+                    closingParenthesis(tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
 

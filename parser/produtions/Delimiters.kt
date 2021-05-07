@@ -5,6 +5,7 @@ import parser.exceptions.ParserException
 import parser.utils.Utils.Companion.lastValidToken
 import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.peekNextToken
+import parser.utils.Utils.Companion.peekNextTokenOrNull
 import utils.Token
 
 class Delimiters {
@@ -137,7 +138,12 @@ class Delimiters {
 
         private fun throwDelimitersError(expectedSymbol: String, tokenBuffer: MutableList<Token>) {
             val lastValidToken = tokenBuffer.lastValidToken()
-            if(lastValidToken != null) {
+            val actualToken = tokenBuffer.peekNextTokenOrNull()
+
+            if (actualToken != null && lastValidToken != null) {
+                val actualTokenCopy = actualToken.copy(line = lastValidToken.line)
+                throw ParserException(actualTokenCopy.line, actualTokenCopy, listOf(expectedSymbol))
+            } else if(lastValidToken != null) {
                 throw ParserException(lastValidToken.line, lastValidToken, listOf(expectedSymbol))
             } else {
                 throw ParserException(0, null, listOf(expectedSymbol))

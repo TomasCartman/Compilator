@@ -31,5 +31,14 @@ procedure start {
     }
 
     a = add(1, 2);
-    printSomething("this.")
+    printSomething("this.");
+    add(3, 2);
+
+    while(x > y) {
+        if(a > b) {
+            y = y + 1;
+        } else if(h + 1 > c - b || p == 1) {
+            y = y + h;
+        }
+    }
 }

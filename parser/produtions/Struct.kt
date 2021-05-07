@@ -68,7 +68,7 @@ class Struct {
         private fun structDefinition(tokenBuffer: MutableList<Token>) {
             try {
                 varDeclaration(tokenBuffer)
-                if (varDeclarationTerminals.contains(tokenBuffer.peekNextToken())) {
+                if (varDeclarationTerminals.contains(tokenBuffer.peekNextToken().value)) {
                     varDeclaration(tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {

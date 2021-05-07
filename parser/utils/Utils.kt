@@ -48,6 +48,13 @@ class Utils {
             throw NextTokenNullException()
         }
 
+        fun MutableList<Token>.peekNextTokenOrNull(): Token? {
+            return if(this.hasNextToken()) {
+                this[0]
+            } else
+                null
+        }
+
         fun MutableList<Token>.addParserException(e: ParserException) {
             val receivedTokenLine = e.receivedToken?.line ?: 0
             val receivedTokenValue = e.receivedToken?.value ?: ""
