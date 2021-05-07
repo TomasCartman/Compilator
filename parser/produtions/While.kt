@@ -1,6 +1,7 @@
 package parser.produtions
 
 import parser.exceptions.NextTokenNullException
+import parser.exceptions.ParserException
 import parser.produtions.Delimiters.Companion.closingParenthesis
 import parser.produtions.Delimiters.Companion.openingParenthesis
 import parser.produtions.Expression.Companion.expression
@@ -12,17 +13,11 @@ import utils.Token
 class While {
     companion object {
         fun whileStatement(tokenBuffer: MutableList<Token>) {
-            try {
-                if (isNextTokenWhile(tokenBuffer.peekNextToken())) {
-                    tokenBuffer.nextToken() // Consume while
-                    openingParenthesis(tokenBuffer)
-                    expression(tokenBuffer)
-                    closingParenthesis(tokenBuffer)
-                    statement(tokenBuffer)
-                }
-            } catch (e: NextTokenNullException) {
-
-            }
+            tokenBuffer.nextToken() // Consume while
+            openingParenthesis(tokenBuffer)
+            expression(tokenBuffer)
+            closingParenthesis(tokenBuffer)
+            statement(tokenBuffer)
         }
 
         fun isNextTokenWhile(token: Token): Boolean = token.value == "while"

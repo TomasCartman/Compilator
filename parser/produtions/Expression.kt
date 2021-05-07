@@ -1,5 +1,6 @@
 package parser.produtions
 
+import parser.exceptions.NextTokenNullException
 import parser.exceptions.ParserException
 import parser.produtions.ArithmeticOperator.Companion.division
 import parser.produtions.ArithmeticOperator.Companion.isNextTokenDivisionSymbol
@@ -31,7 +32,9 @@ import parser.produtions.LogicalOperators.Companion.isNextTokenLogicalNotSymbol
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
 import parser.produtions.Delimiters.Companion.openingParenthesis
 import parser.produtions.VarDeclaration.Companion.isTokenPrimary
+import parser.produtions.VarDeclaration.Companion.primary
 import parser.produtions.VarDeclaration.Companion.primaryStringListName
+import parser.utils.Utils
 import parser.utils.Utils.Companion.nextToken
 import utils.Token
 
@@ -125,17 +128,21 @@ class Expression {
         }
 
         private fun primaryExpression(tokenBuffer: MutableList<Token>) {
-            val tokenPeek = tokenBuffer.peekNextToken()
-            when {
-                isNextTokenOpeningParenthesis(tokenPeek) -> {
-                    openingParenthesis(tokenBuffer)
-                    expression(tokenBuffer)
-                    closingParenthesis(tokenBuffer)
+            try {
+                val tokenPeek = tokenBuffer.peekNextToken()
+                when {
+                    isNextTokenOpeningParenthesis(tokenPeek) -> {
+                        openingParenthesis(tokenBuffer)
+                        expression(tokenBuffer)
+                        closingParenthesis(tokenBuffer)
+                    }
+                    isTokenPrimary(tokenPeek) -> {
+                        primary(tokenBuffer)
+                    }
+                    else -> throw ParserException(tokenPeek.line, tokenPeek, primaryStringListName)
                 }
-                isTokenPrimary(tokenPeek) -> {
-                    tokenBuffer.nextToken() // Consume Primary
-                }
-                else -> throw ParserException(tokenPeek.line, tokenPeek, primaryStringListName)
+            } catch (e: NextTokenNullException) {
+                Utils.throwParserError(primaryStringListName, tokenBuffer)
             }
         }
     }

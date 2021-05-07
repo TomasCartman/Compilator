@@ -1,7 +1,5 @@
 package parser.produtions
 
-import parser.Parser
-import parser.exceptions.NextTokenNullException
 import parser.exceptions.ParserException
 import parser.produtions.Array.Companion.arrayUsage
 import parser.produtions.Delimiters.Companion.closingParenthesis
@@ -23,56 +21,40 @@ import utils.Token
 class IO {
     companion object {
         fun readStat(tokenBuffer: MutableList<Token>) {
-            try {
-                if (tokenBuffer.peekNextToken().value == "read") {
-                    tokenBuffer.nextToken() // Consume read
-                    openingParenthesis(tokenBuffer)
-                    expRead(tokenBuffer)
-                    closingParenthesis(tokenBuffer)
-                    semicolon(tokenBuffer)
-                }
-            } catch (e: NextTokenNullException) {
-
-            }
+            tokenBuffer.nextToken() // Consume read
+            openingParenthesis(tokenBuffer)
+            expRead(tokenBuffer)
+            closingParenthesis(tokenBuffer)
+            semicolon(tokenBuffer)
         }
 
         private fun expRead(tokenBuffer: MutableList<Token>) {
-            try {
-                if (isTokenIdentifier(tokenBuffer.peekNextToken())) {
-                    identifier(tokenBuffer)
-                    if (tokenBuffer.peekNextToken().value == "[") {
-                        tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
-                        arrayUsage(tokenBuffer)
-                    } else if(tokenBuffer.peekNextToken().value == ".") {
-                        tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
-                        structUsage(tokenBuffer)
-                    }
-                } else {
-                    throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(),
-                        listOf("Identifier"))
+            if (isTokenIdentifier(tokenBuffer.peekNextToken())) {
+                identifier(tokenBuffer)
+                if (tokenBuffer.peekNextToken().value == "[") {
+                    tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                    arrayUsage(tokenBuffer)
+                } else if(tokenBuffer.peekNextToken().value == ".") {
+                    tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                    structUsage(tokenBuffer)
                 }
+            } else {
+                throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(),
+                    listOf("Identifier"))
+            }
 
-                if (isNextTokenComma(tokenBuffer.peekNextToken())) {
-                    comma(tokenBuffer)
-                    expRead(tokenBuffer)
-                }
-            } catch (e: NextTokenNullException) {
-
+            if (isNextTokenComma(tokenBuffer.peekNextToken())) {
+                comma(tokenBuffer)
+                expRead(tokenBuffer)
             }
         }
 
         fun printStat(tokenBuffer: MutableList<Token>) {
-            try {
-                if (tokenBuffer.peekNextToken().value == "print") {
-                    tokenBuffer.nextToken() // Consume print
-                    openingParenthesis(tokenBuffer)
-                    expPrint(tokenBuffer)
-                    closingParenthesis(tokenBuffer)
-                    semicolon(tokenBuffer)
-                }
-            } catch (e: NextTokenNullException) {
-
-            }
+            tokenBuffer.nextToken() // Consume print
+            openingParenthesis(tokenBuffer)
+            expPrint(tokenBuffer)
+            closingParenthesis(tokenBuffer)
+            semicolon(tokenBuffer)
         }
 
         private fun expPrint(tokenBuffer: MutableList<Token>) {

@@ -63,5 +63,21 @@ class Utils {
         }
 
         fun MutableList<Token>.getErrors(): List<Token> = errorTokens
+
+
+        fun throwParserError(expected: List<String>, tokenBuffer: MutableList<Token>) {
+            val lastValidToken = tokenBuffer.lastValidToken()
+            val actualToken = tokenBuffer.peekNextTokenOrNull()
+
+            if (actualToken != null && lastValidToken != null) {
+                val actualTokenCopy = actualToken.copy(line = lastValidToken.line)
+                throw ParserException(actualTokenCopy.line, actualTokenCopy, expected)
+            } else if(lastValidToken != null) {
+                val lastValidTokenCopy = lastValidToken.copy(value = "EOF")
+                throw ParserException(lastValidTokenCopy.line, lastValidTokenCopy, expected)
+            } else {
+                throw ParserException(0, null, expected)
+            }
+        }
     }
 }

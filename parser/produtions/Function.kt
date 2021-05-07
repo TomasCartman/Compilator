@@ -27,15 +27,11 @@ import utils.Token
 class Function {
     companion object {
         fun callFunction(tokenBuffer: MutableList<Token>) {
-            try {
-                if (isTokenIdentifier(tokenBuffer.peekNextToken())) {
-                    identifier(tokenBuffer)
-                    openingParenthesis(tokenBuffer)
-                    args(tokenBuffer)
-                    closingParenthesis(tokenBuffer)
-                }
-            } catch (e: NextTokenNullException) {
-
+            if (isTokenIdentifier(tokenBuffer.peekNextToken())) {
+                identifier(tokenBuffer)
+                openingParenthesis(tokenBuffer)
+                args(tokenBuffer)
+                closingParenthesis(tokenBuffer)
             }
         }
 
@@ -125,37 +121,25 @@ class Function {
         }
 
         private fun params(tokenBuffer: MutableList<Token>) {
-            try {
-                if (!isNextTokenClosingParenthesis(tokenBuffer.peekNextToken())) {
-                    param(tokenBuffer)
-                    if (isNextTokenComma(tokenBuffer.peekNextToken())) {
-                        comma(tokenBuffer)
-                        params(tokenBuffer)
-                    }
+            if (!isNextTokenClosingParenthesis(tokenBuffer.peekNextToken())) {
+                param(tokenBuffer)
+                if (isNextTokenComma(tokenBuffer.peekNextToken())) {
+                    comma(tokenBuffer)
+                    params(tokenBuffer)
                 }
-            } catch (e: NextTokenNullException) {
-
             }
         }
 
         private fun param(tokenBuffer: MutableList<Token>) {
-            try {
-                type(tokenBuffer)
-                identifier(tokenBuffer)
-            } catch (e: NextTokenNullException) {
-
-            }
+            type(tokenBuffer)
+            identifier(tokenBuffer)
         }
 
         private fun args(tokenBuffer: MutableList<Token>) {
-            try {
-                arg(tokenBuffer)
-                if (isNextTokenComma(tokenBuffer.peekNextToken())) {
-                    comma(tokenBuffer)
-                    args(tokenBuffer)
-                }
-            } catch (e: NextTokenNullException) {
-
+            arg(tokenBuffer)
+            if (isNextTokenComma(tokenBuffer.peekNextToken())) {
+                comma(tokenBuffer)
+                args(tokenBuffer)
             }
         }
 
@@ -182,6 +166,6 @@ class Function {
 
         fun isNextTokenProcedureDeclaration(token: Token): Boolean = token.value == "procedure"
 
-        fun isNextTokenReturn(token: Token): Boolean = token.value == "return"
+        private fun isNextTokenReturn(token: Token): Boolean = token.value == "return"
     }
 }

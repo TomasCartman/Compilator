@@ -6,6 +6,8 @@ import parser.produtions.Delimiters.Companion.closingCurlyBracket
 import parser.produtions.Delimiters.Companion.isNextTokenClosingCurlyBracket
 import parser.produtions.Delimiters.Companion.openingCurlyBracket
 import parser.produtions.Statement.Companion.statement
+import parser.utils.Utils
+import parser.utils.Utils.Companion.addParserException
 import parser.utils.Utils.Companion.hasNextToken
 import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.peekNextToken
@@ -19,10 +21,12 @@ class Init {
                     tokenBuffer.nextToken()
                     start(tokenBuffer)
                 } else {
-                    throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(), listOf("procedure"))
+                    Utils.throwParserError(listOf("procedure"), tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-                throw ParserException(0, null, listOf("procedure"))
+                Utils.throwParserError(listOf("procedure"), tokenBuffer)
+            } catch (e: ParserException) {
+                tokenBuffer.addParserException(e)
             }
         }
 
@@ -34,10 +38,10 @@ class Init {
                     program(tokenBuffer)
                     closingCurlyBracket(tokenBuffer)
                 } else {
-                    throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(), listOf("start"))
+                    Utils.throwParserError(listOf("start"), tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-                throw ParserException(0, null, listOf("start"))
+                Utils.throwParserError(listOf("start"), tokenBuffer)
             }
         }
 
@@ -51,6 +55,5 @@ class Init {
         private fun isTokenValueProcedure(token: Token): Boolean = token.value == "procedure"
 
         private fun isTokenValueStart(token: Token): Boolean = token.value == "start"
-
     }
 }
