@@ -48,5 +48,7 @@ procedure start {
         }
     }
 
-    while(a>b) { // Error here
-}
+    procedure a() {
+
+    while(a>b) {
+} // Error here 2 times

@@ -144,7 +144,8 @@ class Delimiters {
                 val actualTokenCopy = actualToken.copy(line = lastValidToken.line)
                 throw ParserException(actualTokenCopy.line, actualTokenCopy, listOf(expectedSymbol))
             } else if(lastValidToken != null) {
-                throw ParserException(lastValidToken.line, lastValidToken, listOf(expectedSymbol))
+                val lastValidTokenCopy = lastValidToken.copy(value = "EOF")
+                throw ParserException(lastValidTokenCopy.line, lastValidTokenCopy, listOf(expectedSymbol))
             } else {
                 throw ParserException(0, null, listOf(expectedSymbol))
             }

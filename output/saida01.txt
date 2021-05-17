@@ -1,40 +1,24 @@
-[2] PRE var
-[3] DEL {
-[4] PRE int
-[4] IDE var_int
-[4] DEL ;
-[5] PRE real
-[5] IDE r_e_a_l
-[5] DEL ;
-[6] PRE boolean
-[6] IDE b00lean
-[6] DEL ;
-[7] PRE string
-[7] IDE str1_ng
-[7] DEL ;
-[9] PRE int
-[9] IDE var_int
-[9] LOG !
-[9] DEL ;
-[10] PRE real
-[10] DEL ;
-[11] PRE boolean
-[11] IDE b
-[11] IDE lean
-[11] DEL ;
-[12] PRE string
-[12] IDE str
-[12] LOG !
-[12] IDE g
-[12] DEL ;
-[13] DEL }
-[14] IDE teste
-[14] DEL .
-[14] IDE indentificadores
+[2] - Value: procedure
+[2] - Value: start
+[2] - Value: {
+[3] - Value: var
+[4] - Value: {
+[5] - Value: int
+[5] - Value: var_int
+[5] - Value: ;
+[6] - Value: real
+[6] - Value: r_e_a_l
+[6] - Value: ;
+[7] - Value: boolean
+[7] - Value: b00lean
+[7] - Value: ;
+[8] - Value: string
+[8] - Value: str1_ng
+[8] - Value: ;
+[9] - Value: }
+[10] - Value: teste
+[10] - Value: .
+[10] - Value: indentificadores
+[11] - Value: }
 
-10 Unknown _r_
-10 Unknown _e_
-10 Unknown _a_
-10 Unknown _l;
-11 Unknown @@l
-12 Unknown _ng
+Success parser compilation

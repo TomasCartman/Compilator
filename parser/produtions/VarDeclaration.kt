@@ -20,6 +20,7 @@ import parser.produtions.Function.Companion.callFunction
 import parser.produtions.RelationalOperators.Companion.assignment
 import parser.produtions.RelationalOperators.Companion.isNextTokenAssignmentSymbol
 import parser.produtions.Struct.Companion.structUsage
+import parser.utils.Utils
 import parser.utils.Utils.Companion.peekNextToken
 import parser.utils.Utils.Companion.removeLastReadTokenAndPutBackInTokenList
 import utils.ClassType
@@ -116,7 +117,7 @@ class VarDeclaration {
                     throw ParserException(tokenPeek.line, tokenPeek, types)
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(types, tokenBuffer)
             }
         }
 
@@ -307,7 +308,7 @@ class VarDeclaration {
                     throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(), listOf("Identifier"))
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf("Identifier"), tokenBuffer)
             }
         }
 
@@ -320,7 +321,7 @@ class VarDeclaration {
                     literal(tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(primaryStringListName, tokenBuffer)
             }
         }
 

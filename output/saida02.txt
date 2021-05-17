@@ -1,57 +1,43 @@
-[3] PRE var
-[4] DEL {
-[5] PRE int
-[5] IDE inteiro
-[5] DEL ;
-[6] PRE int
-[6] IDE a
-[6] DEL ;
-[7] PRE real
-[7] IDE numero_real
-[7] DEL ;
-[8] PRE real
-[8] IDE numero_real2
-[8] DEL ;
-[9] DEL }
-[11] PRE start
-[12] DEL {
-[14] IDE inteiro
-[14] REL =
-[14] NRO 1
-[14] DEL ;
-[15] IDE a
-[15] REL =
-[15] NRO 1.1
-[15] DEL ;
-[16] IDE numero_real
-[16] REL =
-[16] NRO 1.123456789
-[17] IDE numero_real2
-[17] REL =
-[17] NRO 123456789
-[17] DEL .
-[17] NRO 1
-[19] IDE inteiro
-[19] REL =
-[19] DEL .
-[19] NRO 1
-[19] DEL ;
-[20] IDE a
-[20] REL =
-[20] NRO 1.1
-[20] DEL ;
-[21] IDE numero_real
-[21] REL =
-[21] NRO 1.123456
-[21] NRO 89
-[22] IDE numero_real2
-[22] REL =
-[22] NRO 1234
-[22] NRO 6789
-[22] DEL .
-[22] NRO 1
-[23] DEL }
-
-20 SIB _
-21 Unknown .789
-22 Unknown @567
+[2] - Value: procedure
+[2] - Value: start
+[2] - Value: {
+[3] - Value: var
+[4] - Value: {
+[5] - Value: int
+[5] - Value: inteiro
+[5] - Value: ;
+[6] - Value: int
+[6] - Value: a
+[6] - Value: ;
+[7] - Value: real
+[7] - Value: numero_real
+[7] - Value: ;
+[8] - Value: real
+[8] - Value: numero_real2
+[8] - Value: ;
+[9] - Value: }
+[11] - Value: inteiro
+[11] - Value: =
+[11] - Value: 1
+[11] - Value: ;
+[12] - Value: a
+[12] - Value: =
+[12] - Value: 1.1
+[12] - Value: ;
+[13] - Value: numero_real
+[13] - Value: =
+[13] - Value: 1.123456789
+[13] - Expected: [;] - Got numero_real2
+[16] - Value: inteiro
+[16] - Value: =
+[16] - Value: 0.1
+[16] - Value: ;
+[17] - Value: a
+[17] - Value: =
+[17] - Value: 1.1
+[17] - Value: ;
+[18] - Value: numero_real
+[18] - Value: =
+[18] - Value: 1.123456
+[18] - Expected: [;] - Got numero_real2
+[20] - Value: }

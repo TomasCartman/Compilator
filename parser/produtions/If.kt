@@ -4,6 +4,7 @@ import parser.produtions.Delimiters.Companion.closingParenthesis
 import parser.produtions.Delimiters.Companion.openingParenthesis
 import parser.produtions.Expression.Companion.expression
 import parser.produtions.Statement.Companion.statement
+import parser.utils.Utils.Companion.hasNextToken
 import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.peekNextToken
 import utils.Token
@@ -16,7 +17,7 @@ class If {
             expression(tokenBuffer)
             closingParenthesis(tokenBuffer)
             statement(tokenBuffer)
-            if (isNextTokenElse(tokenBuffer.peekNextToken())) {
+            if (tokenBuffer.hasNextToken() && isNextTokenElse(tokenBuffer.peekNextToken())) {
                 tokenBuffer.nextToken() // Consume else
                 statement(tokenBuffer)
             }

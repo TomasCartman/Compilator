@@ -11,6 +11,11 @@ class Utils {
         var readTokens = mutableListOf<Token>()
         var errorTokens = mutableListOf<Token>()
 
+        fun MutableList<Token>.reset() {
+            readTokens = mutableListOf()
+            errorTokens = mutableListOf()
+        }
+
         fun MutableList<Token>.hasNextToken(): Boolean = this.isNotEmpty()
 
         fun MutableList<Token>.nextToken(): Token {
@@ -86,6 +91,8 @@ class Utils {
             } else if(lastValidToken != null) {
                 val lastValidTokenCopy = lastValidToken.copy(value = "EOF")
                 throw ParserException(lastValidTokenCopy.line, lastValidTokenCopy, expected)
+            } else if(actualToken != null) {
+                throw ParserException(actualToken.line, actualToken, expected)
             } else {
                 throw ParserException(0, null, expected)
             }

@@ -3,6 +3,7 @@ package parser.produtions
 import parser.exceptions.NextTokenNullException
 import parser.exceptions.ParserException
 import parser.produtions.Delimiters.Companion.closingCurlyBracket
+import parser.produtions.Delimiters.Companion.isNextTokenClosingCurlyBracket
 import parser.utils.Utils.Companion.peekNextToken
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningCurlyBracket
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
@@ -93,18 +94,28 @@ class Statement {
                 tokenBuffer.skipToken()
 
                 var nextToken = tokenBuffer.skipToken()
+                var finalProgram = false
                 var condition = isVarDeclaration(nextToken) || isNextTokenIf(nextToken) || isNextTokenWhile(nextToken)
                         || isNextTokenReadStat(nextToken) || isNextTokenPrintStat(nextToken)
                         || isStructDeclaration(nextToken) || isNextTokenFunctionDeclaration(nextToken)
+                        || isTokenIdentifier(nextToken)
 
                 while(!condition) {
                     nextToken = tokenBuffer.skipToken()
                     condition = isVarDeclaration(nextToken) || isNextTokenIf(nextToken) || isNextTokenWhile(nextToken)
                             || isNextTokenReadStat(nextToken) || isNextTokenPrintStat(nextToken)
                             || isStructDeclaration(nextToken) || isNextTokenFunctionDeclaration(nextToken)
+                            || isTokenIdentifier(nextToken)
+
+                    if (isNextTokenClosingCurlyBracket(nextToken) && tokenBuffer.isEmpty()) {
+                        finalProgram = true
+                        break
+                    }
                 }
                 tokenBuffer.putTokenBack(nextToken)
-                statement(tokenBuffer)
+                if (!finalProgram) {
+                    statement(tokenBuffer)
+                }
             }
         }
 

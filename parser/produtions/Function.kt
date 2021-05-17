@@ -17,7 +17,9 @@ import parser.produtions.Statement.Companion.simpleStatement
 import parser.produtions.VarDeclaration.Companion.identifier
 import parser.produtions.VarDeclaration.Companion.isTokenIdentifier
 import parser.produtions.VarDeclaration.Companion.isTokenPrimary
+import parser.produtions.VarDeclaration.Companion.primaryStringListName
 import parser.produtions.VarDeclaration.Companion.type
+import parser.utils.Utils
 import parser.utils.Utils.Companion.hasNextToken
 import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.peekNextToken
@@ -36,33 +38,25 @@ class Function {
         }
 
         fun functionDeclaration(tokenBuffer: MutableList<Token>) {
-            try {
-                if (isNextTokenFunctionDeclaration(tokenBuffer.peekNextToken())) {
-                    tokenBuffer.nextToken() // Consume function
-                    type(tokenBuffer)
-                    identifier(tokenBuffer)
-                    openingParenthesis(tokenBuffer)
-                    params(tokenBuffer)
-                    closingParenthesis(tokenBuffer)
-                    blockFunction(tokenBuffer)
-                }
-            } catch (e : NextTokenNullException) {
-
+            if (isNextTokenFunctionDeclaration(tokenBuffer.peekNextToken())) {
+                tokenBuffer.nextToken() // Consume function
+                type(tokenBuffer)
+                identifier(tokenBuffer)
+                openingParenthesis(tokenBuffer)
+                params(tokenBuffer)
+                closingParenthesis(tokenBuffer)
+                blockFunction(tokenBuffer)
             }
         }
 
         private fun blockFunction(tokenBuffer: MutableList<Token>) {
-            try {
-                openingCurlyBracket(tokenBuffer)
+            openingCurlyBracket(tokenBuffer)
+            simpleStatement(tokenBuffer)
+            while (tokenBuffer.hasNextToken() && !isNextTokenReturn(tokenBuffer.peekNextToken())) {
                 simpleStatement(tokenBuffer)
-                while (tokenBuffer.hasNextToken() && !isNextTokenReturn(tokenBuffer.peekNextToken())) {
-                    simpleStatement(tokenBuffer)
-                }
-                returnMethod(tokenBuffer)
-                closingCurlyBracket(tokenBuffer)
-            } catch (e: NextTokenNullException) {
-
             }
+            returnMethod(tokenBuffer)
+            closingCurlyBracket(tokenBuffer)
         }
 
         private fun returnMethod(tokenBuffer: MutableList<Token>) {
@@ -86,44 +80,38 @@ class Function {
                         expression(tokenBuffer)
                         semicolon(tokenBuffer)
                     }
+                } else {
+                    Utils.throwParserError(listOf("return"), tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf("return"), tokenBuffer)
             }
         }
 
         fun procedureDeclaration(tokenBuffer: MutableList<Token>) {
-            try {
-                if (isNextTokenProcedureDeclaration(tokenBuffer.peekNextToken())) {
-                    tokenBuffer.nextToken() // Consume procedure
-                    identifier(tokenBuffer)
-                    openingParenthesis(tokenBuffer)
-                    params(tokenBuffer)
-                    closingParenthesis(tokenBuffer)
-                    blockProcedure(tokenBuffer)
-                }
-            } catch (e : NextTokenNullException) {
-
+            if (isNextTokenProcedureDeclaration(tokenBuffer.peekNextToken())) {
+                tokenBuffer.nextToken() // Consume procedure
+                identifier(tokenBuffer)
+                openingParenthesis(tokenBuffer)
+                params(tokenBuffer)
+                closingParenthesis(tokenBuffer)
+                blockProcedure(tokenBuffer)
             }
         }
 
         private fun blockProcedure(tokenBuffer: MutableList<Token>) {
-            try {
-                openingCurlyBracket(tokenBuffer)
+            openingCurlyBracket(tokenBuffer)
+            simpleStatement(tokenBuffer)
+            while (tokenBuffer.hasNextToken() && !isNextTokenClosingCurlyBracket(tokenBuffer.peekNextToken())) {
                 simpleStatement(tokenBuffer)
-                while (tokenBuffer.hasNextToken() && !isNextTokenClosingCurlyBracket(tokenBuffer.peekNextToken())) {
-                    simpleStatement(tokenBuffer)
-                }
-                closingCurlyBracket(tokenBuffer)
-            } catch (e: NextTokenNullException) {
-
             }
+            closingCurlyBracket(tokenBuffer)
         }
 
         private fun params(tokenBuffer: MutableList<Token>) {
-            if (!isNextTokenClosingParenthesis(tokenBuffer.peekNextToken())) {
+            if (tokenBuffer.hasNextToken() && !isNextTokenClosingParenthesis(tokenBuffer.peekNextToken())) {
                 param(tokenBuffer)
-                if (isNextTokenComma(tokenBuffer.peekNextToken())) {
+                if (tokenBuffer.hasNextToken() && isNextTokenComma(tokenBuffer.peekNextToken())) {
                     comma(tokenBuffer)
                     params(tokenBuffer)
                 }
@@ -137,7 +125,7 @@ class Function {
 
         private fun args(tokenBuffer: MutableList<Token>) {
             arg(tokenBuffer)
-            if (isNextTokenComma(tokenBuffer.peekNextToken())) {
+            if (tokenBuffer.hasNextToken() && isNextTokenComma(tokenBuffer.peekNextToken())) {
                 comma(tokenBuffer)
                 args(tokenBuffer)
             }
@@ -158,7 +146,7 @@ class Function {
                     }
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(primaryStringListName, tokenBuffer)
             }
         }
 
