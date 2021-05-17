@@ -11,6 +11,8 @@ import parser.produtions.VarDeclaration.Companion.identifier
 import parser.produtions.VarDeclaration.Companion.isTokenIdentifier
 import parser.produtions.VarDeclaration.Companion.varDeclaration
 import parser.produtions.VarDeclaration.Companion.varDeclarationTerminals
+import parser.utils.Utils
+import parser.utils.Utils.Companion.hasNextToken
 import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.peekNextToken
 import utils.Token
@@ -18,61 +20,55 @@ import utils.Token
 class Struct {
     companion object {
         fun structUsage(tokenBuffer: MutableList<Token>) {
-            try {
-                if (isTokenIdentifier(tokenBuffer.peekNextToken())) {
-                    identifier(tokenBuffer)
-                    if (isNextTokenDot(tokenBuffer.peekNextToken())) {
-                        dot(tokenBuffer)
-                        if (isTokenIdentifier(tokenBuffer.peekNextToken())) {
-                            identifier(tokenBuffer)
-                        }
+            if (tokenBuffer.hasNextToken() && isTokenIdentifier(tokenBuffer.peekNextToken())) {
+                identifier(tokenBuffer)
+                if (tokenBuffer.hasNextToken() && isNextTokenDot(tokenBuffer.peekNextToken())) {
+                    dot(tokenBuffer)
+                    if (tokenBuffer.hasNextToken() && isTokenIdentifier(tokenBuffer.peekNextToken())) {
+                        identifier(tokenBuffer)
+                    } else {
+                        Utils.throwParserError(listOf("Identifier"), tokenBuffer)
                     }
+                } else {
+                    Utils.throwParserError(listOf("."), tokenBuffer)
                 }
-            } catch (e: NextTokenNullException) {
-
+            } else {
+                Utils.throwParserError(listOf("Identifier"), tokenBuffer)
             }
         }
 
         fun structDeclaration(tokenBuffer: MutableList<Token>) {
-            try {
-                if (tokenBuffer.peekNextToken().value == "typedef") {
-                    tokenBuffer.nextToken() // Consume typedef
-                    if (tokenBuffer.peekNextToken().value == "struct") {
-                        tokenBuffer.nextToken() // Consume struct
-                        if (tokenBuffer.peekNextToken().value == "extends") {
-                            tokenBuffer.nextToken() // Consume extends
-                            identifier(tokenBuffer)
-                            openingCurlyBracket(tokenBuffer)
-                            structDefinition(tokenBuffer)
-                            closingCurlyBracket(tokenBuffer)
-                            identifier(tokenBuffer)
-                            semicolon(tokenBuffer)
-                        } else {
-                            openingCurlyBracket(tokenBuffer)
-                            structDefinition(tokenBuffer)
-                            closingCurlyBracket(tokenBuffer)
-                            identifier(tokenBuffer)
-                            semicolon(tokenBuffer)
-                        }
+            if (tokenBuffer.hasNextToken() && tokenBuffer.peekNextToken().value == "typedef") {
+                tokenBuffer.nextToken() // Consume typedef
+                if (tokenBuffer.hasNextToken() && tokenBuffer.peekNextToken().value == "struct") {
+                    tokenBuffer.nextToken() // Consume struct
+                    if (tokenBuffer.hasNextToken() && tokenBuffer.peekNextToken().value == "extends") {
+                        tokenBuffer.nextToken() // Consume extends
+                        identifier(tokenBuffer)
+                        openingCurlyBracket(tokenBuffer)
+                        structDefinition(tokenBuffer)
+                        closingCurlyBracket(tokenBuffer)
+                        identifier(tokenBuffer)
+                        semicolon(tokenBuffer)
                     } else {
-                        throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(), listOf("struct"))
+                        openingCurlyBracket(tokenBuffer)
+                        structDefinition(tokenBuffer)
+                        closingCurlyBracket(tokenBuffer)
+                        identifier(tokenBuffer)
+                        semicolon(tokenBuffer)
                     }
                 } else {
-                    throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(), listOf("typedef"))
+                    Utils.throwParserError(listOf("struct"), tokenBuffer)
                 }
-            } catch (e: NextTokenNullException) {
-
+            } else {
+                Utils.throwParserError(listOf("typedef"), tokenBuffer)
             }
         }
 
         private fun structDefinition(tokenBuffer: MutableList<Token>) {
-            try {
+            varDeclaration(tokenBuffer)
+            if (tokenBuffer.hasNextToken() && varDeclarationTerminals.contains(tokenBuffer.peekNextToken().value)) {
                 varDeclaration(tokenBuffer)
-                if (varDeclarationTerminals.contains(tokenBuffer.peekNextToken().value)) {
-                    varDeclaration(tokenBuffer)
-                }
-            } catch (e: NextTokenNullException) {
-
             }
         }
 

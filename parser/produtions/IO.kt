@@ -1,5 +1,6 @@
 package parser.produtions
 
+import parser.exceptions.NextTokenNullException
 import parser.exceptions.ParserException
 import parser.produtions.Array.Companion.arrayUsage
 import parser.produtions.Delimiters.Companion.closingParenthesis
@@ -13,6 +14,8 @@ import parser.produtions.VarDeclaration.Companion.isTokenIdentifier
 import parser.produtions.VarDeclaration.Companion.isTokenLiteral
 import parser.produtions.VarDeclaration.Companion.literal
 import parser.produtions.VarDeclaration.Companion.primaryStringListName
+import parser.utils.Utils
+import parser.utils.Utils.Companion.hasNextToken
 import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.peekNextToken
 import parser.utils.Utils.Companion.removeLastReadTokenAndPutBackInTokenList
@@ -29,12 +32,12 @@ class IO {
         }
 
         private fun expRead(tokenBuffer: MutableList<Token>) {
-            if (isTokenIdentifier(tokenBuffer.peekNextToken())) {
+            if (tokenBuffer.hasNextToken() && isTokenIdentifier(tokenBuffer.peekNextToken())) {
                 identifier(tokenBuffer)
-                if (tokenBuffer.peekNextToken().value == "[") {
+                if (tokenBuffer.hasNextToken() &&tokenBuffer.peekNextToken().value == "[") {
                     tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
                     arrayUsage(tokenBuffer)
-                } else if(tokenBuffer.peekNextToken().value == ".") {
+                } else if(tokenBuffer.hasNextToken() &&tokenBuffer.peekNextToken().value == ".") {
                     tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
                     structUsage(tokenBuffer)
                 }
@@ -43,7 +46,7 @@ class IO {
                     listOf("Identifier"))
             }
 
-            if (isNextTokenComma(tokenBuffer.peekNextToken())) {
+            if (tokenBuffer.hasNextToken() &&isNextTokenComma(tokenBuffer.peekNextToken())) {
                 comma(tokenBuffer)
                 expRead(tokenBuffer)
             }
@@ -58,23 +61,27 @@ class IO {
         }
 
         private fun expPrint(tokenBuffer: MutableList<Token>) {
-            if (isTokenIdentifier(tokenBuffer.peekNextToken())) {
-                identifier(tokenBuffer)
-                if (tokenBuffer.peekNextToken().value == "[") {
-                    tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
-                    arrayUsage(tokenBuffer)
-                } else if(tokenBuffer.peekNextToken().value == ".") {
-                    tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
-                    structUsage(tokenBuffer)
+            try {
+                if (tokenBuffer.hasNextToken() &&isTokenIdentifier(tokenBuffer.peekNextToken())) {
+                    identifier(tokenBuffer)
+                    if (tokenBuffer.hasNextToken() &&tokenBuffer.peekNextToken().value == "[") {
+                        tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                        arrayUsage(tokenBuffer)
+                    } else if(tokenBuffer.hasNextToken() &&tokenBuffer.peekNextToken().value == ".") {
+                        tokenBuffer.removeLastReadTokenAndPutBackInTokenList()
+                        structUsage(tokenBuffer)
+                    }
+                } else if(tokenBuffer.hasNextToken() &&isTokenLiteral(tokenBuffer.peekNextToken())) {
+                    literal(tokenBuffer)
+                } else {
+                    throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(),
+                        primaryStringListName)
                 }
-            } else if(isTokenLiteral(tokenBuffer.peekNextToken())) {
-                literal(tokenBuffer)
-            } else {
-                throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(),
-                    primaryStringListName)
+            } catch (e: NextTokenNullException) {
+                Utils.throwParserError(primaryStringListName, tokenBuffer)
             }
 
-            if (isNextTokenComma(tokenBuffer.peekNextToken())) {
+            if (tokenBuffer.hasNextToken() && isNextTokenComma(tokenBuffer.peekNextToken())) {
                 comma(tokenBuffer)
                 expPrint(tokenBuffer)
             }

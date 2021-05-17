@@ -21,6 +21,7 @@ import parser.produtions.RelationalOperators.Companion.assignment
 import parser.produtions.RelationalOperators.Companion.isNextTokenAssignmentSymbol
 import parser.produtions.Struct.Companion.structUsage
 import parser.utils.Utils
+import parser.utils.Utils.Companion.hasNextToken
 import parser.utils.Utils.Companion.peekNextToken
 import parser.utils.Utils.Companion.removeLastReadTokenAndPutBackInTokenList
 import utils.ClassType
@@ -53,59 +54,39 @@ class VarDeclaration {
                     }
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf("var", "const"), tokenBuffer)
             }
         }
 
         private fun typedVariable(tokenBuffer: MutableList<Token>) {
-            try {
-                type(tokenBuffer)
-                variables(tokenBuffer)
-                semicolon(tokenBuffer)
-                if(types.contains(tokenBuffer.peekNextToken().value)) {
-                    typedVariable(tokenBuffer)
-                }
-            } catch (e: NextTokenNullException) {
-
+            type(tokenBuffer)
+            variables(tokenBuffer)
+            semicolon(tokenBuffer)
+            if(tokenBuffer.hasNextToken() && types.contains(tokenBuffer.peekNextToken().value)) {
+                typedVariable(tokenBuffer)
             }
         }
 
         private fun typedConst(tokenBuffer: MutableList<Token>) {
-            try {
-                type(tokenBuffer)
-                constants(tokenBuffer)
-                semicolon(tokenBuffer)
-                if(types.contains(tokenBuffer.peekNextToken().value)) {
-                    typedConst(tokenBuffer)
-                }
-            } catch (e: NextTokenNullException) {
-
+            type(tokenBuffer)
+            constants(tokenBuffer)
+            semicolon(tokenBuffer)
+            if(tokenBuffer.hasNextToken() && types.contains(tokenBuffer.peekNextToken().value)) {
+                typedConst(tokenBuffer)
             }
         }
 
         private fun constants(tokenBuffer: MutableList<Token>) {
-            try {
-                constDeclarator(tokenBuffer)
-                if(isNextTokenComma(tokenBuffer.peekNextToken())) {
-                    constants(tokenBuffer)
-                }
-            } catch (e: NextTokenNullException) {
-
+            constDeclarator(tokenBuffer)
+            if(tokenBuffer.hasNextToken() && isNextTokenComma(tokenBuffer.peekNextToken())) {
+                constants(tokenBuffer)
             }
         }
 
         private fun constDeclarator(tokenBuffer: MutableList<Token>) {
-            try {
-                if(isTokenIdentifier(tokenBuffer.peekNextToken())) {
-                    identifier(tokenBuffer)
-                    assignment(tokenBuffer)
-                    if(isTokenLiteral(tokenBuffer.peekNextToken())) {
-                        literal(tokenBuffer)
-                    }
-                }
-            } catch (e: NextTokenNullException) {
-
-            }
+            identifier(tokenBuffer)
+            assignment(tokenBuffer)
+            literal(tokenBuffer)
         }
 
         fun type(tokenBuffer: MutableList<Token>) {
@@ -114,7 +95,7 @@ class VarDeclaration {
                 if(types.contains(tokenPeek.value)) {
                     tokenBuffer.nextToken()
                 } else {
-                    throw ParserException(tokenPeek.line, tokenPeek, types)
+                    Utils.throwParserError(types, tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
                 Utils.throwParserError(types, tokenBuffer)
@@ -122,15 +103,10 @@ class VarDeclaration {
         }
 
         private fun variables(tokenBuffer: MutableList<Token>) {
-            try {
-                variableDeclarator(tokenBuffer)
-                val tokenPeek = tokenBuffer.peekNextToken()
-                if(isNextTokenComma(tokenPeek)) {
-                    comma(tokenBuffer)
-                    variables(tokenBuffer)
-                }
-            } catch (e: NextTokenNullException) {
-
+            variableDeclarator(tokenBuffer)
+            if(tokenBuffer.hasNextToken() && isNextTokenComma(tokenBuffer.peekNextToken())) {
+                comma(tokenBuffer)
+                variables(tokenBuffer)
             }
         }
 
@@ -190,25 +166,17 @@ class VarDeclaration {
         }
 
         private fun varArgs(tokenBuffer: MutableList<Token>) {
-            try {
-                if (!isNextTokenClosingCurlyBracket(tokenBuffer.peekNextToken())) {
-                    varArg(tokenBuffer)
-                    if (isNextTokenComma(tokenBuffer.peekNextToken())) {
-                        comma(tokenBuffer)
-                        varArgs(tokenBuffer)
-                    }
+            if (tokenBuffer.hasNextToken() &&  !isNextTokenClosingCurlyBracket(tokenBuffer.peekNextToken())) {
+                varArg(tokenBuffer)
+                if (tokenBuffer.hasNextToken() &&  isNextTokenComma(tokenBuffer.peekNextToken())) {
+                    comma(tokenBuffer)
+                    varArgs(tokenBuffer)
                 }
-            } catch (e: NextTokenNullException) {
-
             }
         }
 
         private fun varArg(tokenBuffer: MutableList<Token>) {
-            try {
-                primary(tokenBuffer)
-            } catch (e: NextTokenNullException) {
-
-            }
+            primary(tokenBuffer)
         }
 
         fun variableUsage(tokenBuffer: MutableList<Token>) {
@@ -334,7 +302,7 @@ class VarDeclaration {
                         listOf("true", "false", "real", "int", "string"))
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf("true", "false", "real", "int", "string"), tokenBuffer)
             }
         }
 
@@ -342,9 +310,11 @@ class VarDeclaration {
             try {
                 if(isTokenVariableScopeType(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    Utils.throwParserError(variableScopeType, tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(variableScopeType, tokenBuffer)
             }
         }
 

@@ -13,6 +13,7 @@ procedure start {
     var {
         int a, e = 3, d;
         string b="hi", c;
+        boolean isRunning = false;
     }
 
     print("Choose the value of 'a'");
@@ -36,6 +37,10 @@ procedure start {
 
     if(a >> b) { // Error here
 
+    }
+
+    if (!isRunning) {
+        isRunning = true;
     }
 
     var {] // Error here

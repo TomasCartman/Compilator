@@ -31,6 +31,7 @@ import parser.produtions.Delimiters.Companion.closingParenthesis
 import parser.produtions.LogicalOperators.Companion.isNextTokenLogicalNotSymbol
 import parser.produtions.Delimiters.Companion.isNextTokenOpeningParenthesis
 import parser.produtions.Delimiters.Companion.openingParenthesis
+import parser.produtions.LogicalOperators.Companion.logicalNot
 import parser.produtions.VarDeclaration.Companion.isTokenPrimary
 import parser.produtions.VarDeclaration.Companion.primary
 import parser.produtions.VarDeclaration.Companion.primaryStringListName
@@ -121,6 +122,7 @@ class Expression {
 
         private fun unaryExpression(tokenBuffer: MutableList<Token>) {
             if (isNextTokenLogicalNotSymbol(tokenBuffer.peekNextToken())) {
+                logicalNot(tokenBuffer)
                 unaryExpression(tokenBuffer)
             } else {
                 primaryExpression(tokenBuffer)

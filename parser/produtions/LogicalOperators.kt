@@ -1,6 +1,7 @@
 package parser.produtions
 
 import parser.exceptions.NextTokenNullException
+import parser.utils.Utils
 import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.peekNextToken
 import utils.Token
@@ -11,9 +12,11 @@ class LogicalOperators {
             try {
                 if (isNextTokenLogicalOrSymbol(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    Utils.throwParserError(listOf("||"), tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf("||"), tokenBuffer)
             }
         }
 
@@ -21,9 +24,23 @@ class LogicalOperators {
             try {
                 if (isNextTokenLogicalAndSymbol(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    Utils.throwParserError(listOf("&&"), tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
+                Utils.throwParserError(listOf("&&"), tokenBuffer)
+            }
+        }
 
+        fun logicalNot(tokenBuffer: MutableList<Token>) {
+            try {
+                if (isNextTokenLogicalNotSymbol(tokenBuffer.peekNextToken())) {
+                    tokenBuffer.nextToken()
+                } else {
+                    Utils.throwParserError(listOf("!"), tokenBuffer)
+                }
+            } catch (e: NextTokenNullException) {
+                Utils.throwParserError(listOf("!"), tokenBuffer)
             }
         }
 

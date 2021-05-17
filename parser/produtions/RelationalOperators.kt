@@ -2,6 +2,7 @@ package parser.produtions
 
 import parser.exceptions.NextTokenNullException
 import parser.exceptions.ParserException
+import parser.utils.Utils
 import parser.utils.Utils.Companion.nextToken
 import parser.utils.Utils.Companion.peekNextToken
 import utils.Token
@@ -17,7 +18,7 @@ class RelationalOperators {
                     throw ParserException(tokenBuffer.peekNextToken().line, tokenBuffer.peekNextToken(), listOf("="))
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf("="), tokenBuffer)
             }
         }
 
@@ -25,9 +26,11 @@ class RelationalOperators {
             try {
                 if (isNextTokenEqualSymbol(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    Utils.throwParserError(listOf("=="), tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf("=="), tokenBuffer)
             }
         }
 
@@ -35,9 +38,11 @@ class RelationalOperators {
             try {
                 if (isNextTokenNotEqualSymbol(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    Utils.throwParserError(listOf("!="), tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf("!="), tokenBuffer)
             }
         }
 
@@ -45,9 +50,11 @@ class RelationalOperators {
             try {
                 if (isNextTokenGreaterThanSymbol(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    Utils.throwParserError(listOf(">"), tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf(">"), tokenBuffer)
             }
         }
 
@@ -55,9 +62,11 @@ class RelationalOperators {
             try {
                 if (isNextTokenLessThanSymbol(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    Utils.throwParserError(listOf("<"), tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf("<"), tokenBuffer)
             }
         }
 
@@ -65,9 +74,11 @@ class RelationalOperators {
             try {
                 if (isNextTokenGreaterThanOrEqualSymbol(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    Utils.throwParserError(listOf(">="), tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf(">="), tokenBuffer)
             }
         }
 
@@ -75,9 +86,11 @@ class RelationalOperators {
             try {
                 if (isNextTokenLessThanOrEqualSymbol(tokenBuffer.peekNextToken())) {
                     tokenBuffer.nextToken()
+                } else {
+                    Utils.throwParserError(listOf("<="), tokenBuffer)
                 }
             } catch (e: NextTokenNullException) {
-
+                Utils.throwParserError(listOf("<="), tokenBuffer)
             }
         }
 
