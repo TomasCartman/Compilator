@@ -32,7 +32,9 @@ import parser.produtions.While.Companion.isNextTokenWhile
 import parser.produtions.While.Companion.whileStatement
 import parser.utils.Utils.Companion.addParserException
 import parser.utils.Utils.Companion.nextToken
+import parser.utils.Utils.Companion.putTokenBack
 import parser.utils.Utils.Companion.removeLastReadTokenAndPutBackInTokenList
+import parser.utils.Utils.Companion.skipToken
 import utils.Token
 
 class Statement {
@@ -88,6 +90,20 @@ class Statement {
 
             } catch (e: ParserException) {
                 tokenBuffer.addParserException(e)
+                tokenBuffer.skipToken()
+
+                var nextToken = tokenBuffer.skipToken()
+                var condition = isVarDeclaration(nextToken) || isNextTokenIf(nextToken) || isNextTokenWhile(nextToken)
+                        || isNextTokenReadStat(nextToken) || isNextTokenPrintStat(nextToken)
+                        || isStructDeclaration(nextToken) || isNextTokenFunctionDeclaration(nextToken)
+
+                while(!condition) {
+                    nextToken = tokenBuffer.skipToken()
+                    condition = isVarDeclaration(nextToken) || isNextTokenIf(nextToken) || isNextTokenWhile(nextToken)
+                            || isNextTokenReadStat(nextToken) || isNextTokenPrintStat(nextToken)
+                            || isStructDeclaration(nextToken) || isNextTokenFunctionDeclaration(nextToken)
+                }
+                tokenBuffer.putTokenBack(nextToken)
                 statement(tokenBuffer)
             }
         }

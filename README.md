@@ -19,9 +19,7 @@ This compiler is being made in **kotlin** language and for now it has only the l
 | String  | \( Letter &#124; Digit &#124; Symbol &#124; **`\"`** \)  |
 | Symbol  | ASCII from 32 to 126 (except 34)  |
 
-## Syntactic example of code
-<code>
-
+## Syntax example of code
     procedure start {
         const {
             real pi = 3.1415;
@@ -66,5 +64,3 @@ This compiler is being made in **kotlin** language and for now it has only the l
             }
         }
     }
-
-</code>

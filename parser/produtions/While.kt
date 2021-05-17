@@ -1,13 +1,10 @@
 package parser.produtions
 
-import parser.exceptions.NextTokenNullException
-import parser.exceptions.ParserException
 import parser.produtions.Delimiters.Companion.closingParenthesis
 import parser.produtions.Delimiters.Companion.openingParenthesis
 import parser.produtions.Expression.Companion.expression
 import parser.produtions.Statement.Companion.statement
 import parser.utils.Utils.Companion.nextToken
-import parser.utils.Utils.Companion.peekNextToken
 import utils.Token
 
 class While {

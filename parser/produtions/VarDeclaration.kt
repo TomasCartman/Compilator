@@ -188,7 +188,7 @@ class VarDeclaration {
             }
         }
 
-        fun varArgs(tokenBuffer: MutableList<Token>) {
+        private fun varArgs(tokenBuffer: MutableList<Token>) {
             try {
                 if (!isNextTokenClosingCurlyBracket(tokenBuffer.peekNextToken())) {
                     varArg(tokenBuffer)

@@ -34,6 +34,12 @@ procedure start {
     printSomething("this.");
     add(3, 2);
 
+    if(a >> b) { // Error here
+
+    }
+
+    var {] // Error here
+
     while(x > y) {
         if(a > b) {
             y = y + 1;
@@ -41,4 +47,6 @@ procedure start {
             y = y + h;
         }
     }
+
+    while(a>b) { // Error here
 }

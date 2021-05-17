@@ -2,6 +2,7 @@ package parser.utils
 
 import parser.exceptions.NextTokenNullException
 import parser.exceptions.ParserException
+import parser.utils.Utils.Companion.nextToken
 import utils.ClassType
 import utils.Token
 
@@ -17,6 +18,16 @@ class Utils {
                 val token = this[0]
                 this.removeAt(0)
                 readTokens.add(token)
+                return token
+            }
+            throw NextTokenNullException()
+        }
+
+        fun MutableList<Token>.skipToken(): Token {
+            if(this.hasNextToken()) {
+                val token = this[0]
+                this.removeAt(0)
+                //readTokens.add(token)
                 return token
             }
             throw NextTokenNullException()
